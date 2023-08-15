@@ -1,0 +1,39 @@
+{
+  "name": "tires-bot",
+  "version": "0.0.1",
+  "description": "Tires telegram bot",
+  "main": "main.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node ./dist/main.js",
+    "dev": "nodemon --legacy-watch --exitcrash  ./src/main.ts",
+    "generate": "npx prisma generate",
+    "dev:migrate": "npx prisma migrate dev",
+    "reset:migrate": "npx prisma migrate reset"
+  },
+  "keywords": [
+    "Bot",
+    "Telegram",
+    "Tires"
+  ],
+  "author": "Shuma",
+  "license": "ISC",
+  "devDependencies": {
+    "@prisma/client": "^5.1.1",
+    "@types/node": "^20.5.0",
+    "@typescript-eslint/eslint-plugin": "^6.4.0",
+    "@typescript-eslint/parser": "^6.4.0",
+    "eslint": "^8.47.0",
+    "nodemon": "^3.0.1",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.1.6"
+  },
+  "dependencies": {
+    "brandi": "^5.0.0",
+    "dotenv": "^16.3.1",
+    "prisma": "^5.1.1",
+    "telegraf": "^4.12.2",
+    "telegraf-session-local": "^2.1.1",
+    "winston": "^3.10.0"
+  }
+}
