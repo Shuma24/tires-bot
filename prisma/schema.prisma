@@ -6,3 +6,26 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Tires {
+  id          Int       @id @default(autoincrement())
+  images      Images[]
+  name        String
+  description String
+  price       Int
+  radius      Int
+  width       Int
+  height      Int
+  type        String
+  createdAt   DateTime? @default(now())
+  updatedAt   DateTime? @updatedAt
+}
+
+model Images {
+  id        Int       @id @default(autoincrement())
+  Tires     Tires?    @relation(fields: [tiresId], references: [id])
+  tiresId   Int?
+  url       String
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+}

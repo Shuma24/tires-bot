@@ -4,6 +4,7 @@ import { ILoggerService } from './common/interfaces/logger.service.interface';
 import { Command } from './commands/command';
 
 import { IBot } from './tg-bot/interface/bot.interface';
+import { IORMService } from './dataBase/orm.interface';
 
 export class Application {
   commands: Command[] = [];
@@ -12,8 +13,10 @@ export class Application {
     private readonly _bot: IBot,
     private readonly _loggerService: ILoggerService,
     private readonly _startCommand: Command,
+    private readonly _ormService: IORMService,
+    private readonly _addProductCommand: Command,
   ) {
-    this.commands = [_startCommand];
+    this.commands = [_startCommand, _addProductCommand];
   }
 
   initCommands() {
@@ -22,11 +25,17 @@ export class Application {
     }
   }
 
+  connectToDataBase() {
+    this._ormService.connect();
+  }
+
   init() {
     try {
+      this.connectToDataBase();
+
       this.initCommands();
 
-      this._bot.instance.launch();
+      this._bot.instance.start();
 
       this._loggerService.info('Bot started and ready to work');
     } catch (error) {
@@ -37,4 +46,11 @@ export class Application {
   }
 }
 
-injected(Application, TOKENS.bot, TOKENS.loggerService, TOKENS.startCommand);
+injected(
+  Application,
+  TOKENS.bot,
+  TOKENS.loggerService,
+  TOKENS.startCommand,
+  TOKENS.ormService,
+  TOKENS.addProductCommand,
+);

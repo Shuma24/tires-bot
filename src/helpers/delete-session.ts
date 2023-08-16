@@ -1,4 +1,4 @@
-import fs from 'fs';
+/* import fs from 'fs';
 import { ISessionData } from '../tg-bot/interface/bot-context.interface';
 
 interface ISessionBody {
@@ -26,3 +26,4 @@ export const clearOldSession = () => {
 
   fs.writeFileSync('../session_db.json', JSON.stringify(sessionData));
 };
+ */

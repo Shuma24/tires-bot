@@ -1,13 +1,18 @@
-import { Context } from 'telegraf';
+import { Context, SessionFlavor } from 'grammy';
+
+interface IImages {
+  id: string;
+}
 
 export interface ISessionData {
   type: string;
   radius: number;
   width: number;
   height: number;
-  lastActivity: string;
+  name: string;
+  description: string;
+  price: number;
+  images: IImages[];
 }
 
-export interface IBotContext extends Context {
-  session: ISessionData;
-}
+export type IBotContext = Context & SessionFlavor<ISessionData>;

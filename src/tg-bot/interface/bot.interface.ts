@@ -1,6 +1,6 @@
-import { Telegraf } from 'telegraf';
+import { Bot } from 'grammy';
 import { IBotContext } from './bot-context.interface';
 
 export interface IBot {
-  instance: Telegraf<IBotContext>;
+  instance: Bot<IBotContext>;
 }
