@@ -1,4 +1,5 @@
 import { Bot, enhanceStorage, session } from 'grammy';
+import { conversations, createConversation } from '@grammyjs/conversations';
 
 import { IConfigService } from '../common/interfaces/config.service.interface';
 import { IBot } from './interface/bot.interface';
@@ -7,11 +8,18 @@ import { TOKENS } from '../containter/tokens';
 import { IBotContext } from './interface/bot-context.interface';
 import { FileAdapter } from '@grammyjs/storage-file';
 import { commandList } from './helpers/commands-list';
+import { BaseConversation } from '../conversations/conversation';
+import { IProductRepository } from '../product/interfaces/product-repository.interface';
 
 export class myBot implements IBot {
   instance: Bot<IBotContext>;
+  ListOfConversations: BaseConversation[];
 
-  constructor(private readonly _configService: IConfigService) {
+  constructor(
+    private readonly _configService: IConfigService,
+    private readonly _addProductConversation: BaseConversation,
+    private readonly _productRepository: IProductRepository,
+  ) {
     this.instance = new Bot(this._configService.get('BOT_SECRET'));
     this.instance.use(
       session({
@@ -23,18 +31,29 @@ export class myBot implements IBot {
           price: 0,
           description: '',
           height: 0,
-          images: [],
+          images: [{ id: '' }],
         }),
         storage: enhanceStorage({
           storage: new FileAdapter({
             dirName: '../../session',
           }),
-          millisecondsToLive: 30 * 60 * 1000,
+          millisecondsToLive: 60 * 1000,
         }),
       }),
     );
+    this.instance.use(conversations());
     this.instance.api.setMyCommands(commandList);
+
+    this.ListOfConversations = [_addProductConversation];
+
+    this.ListOfConversations.forEach((el) => {
+      this.instance.use(
+        createConversation(el.handle.bind(this._productRepository), {
+          id: el.getName(),
+        }),
+      );
+    });
   }
 }
 
-injected(myBot, TOKENS.configService);
+injected(myBot, TOKENS.configService, TOKENS.addProductConversation, TOKENS.productRepository);

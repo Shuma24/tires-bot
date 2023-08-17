@@ -4,8 +4,8 @@ import { TOKENS } from '../../containter/tokens';
 import { IBot } from '../../tg-bot/interface/bot.interface';
 
 import { ILoggerService } from '../../common/interfaces/logger.service.interface';
-import { heightButtons, radiusButtons, seasonButtons, startButtons } from '../helpers/buttons';
-import { generateWidthTires } from '../helpers/width-button.generator';
+import { heightButtons, radiusButtons, seasonButtons, startButtons } from '../../helpers/buttons';
+import { generateWidthTires } from '../../helpers/width-button.generator';
 import { heightRegex, radiusRegex, typesRegex, widthRegex } from '../helpers/regexs';
 import { checkType } from '../helpers/type-selector';
 import { handleBackHomeButtons } from '../helpers/back-home.handle';

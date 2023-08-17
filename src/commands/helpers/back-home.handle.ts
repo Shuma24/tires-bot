@@ -1,5 +1,5 @@
-import { radiusButtons, seasonButtons, startButtons } from './buttons';
-import { generateWidthTires } from './width-button.generator';
+import { radiusButtons, seasonButtons, startButtons } from '../../helpers/buttons';
+import { generateWidthTires } from '../../helpers/width-button.generator';
 
 interface Button {
   text: string;

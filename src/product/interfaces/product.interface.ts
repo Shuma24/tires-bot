@@ -13,8 +13,9 @@ export interface ITires {
 }
 
 export interface ITiresImages {
-  tiresId: number;
+  id: number;
+  tiresId: number | null;
   url: string;
-  createdAt?: Date;
-  updatedAt?: Date;
+  createdAt: Date | null;
+  updatedAt: Date | null;
 }

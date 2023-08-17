@@ -5,7 +5,7 @@ import { IBot } from '../../tg-bot/interface/bot.interface';
 import { Command } from '../command';
 import { IConfigService } from '../../common/interfaces/config.service.interface';
 
-import { readyRegex } from '../helpers/regexs';
+//import { readyRegex } from '../helpers/regexs';
 
 export class AddProduct extends Command {
   constructor(
@@ -20,51 +20,17 @@ export class AddProduct extends Command {
 
   handle(): void {
     this.bot.command('add', async (ctx) => {
+      const adminsID = this._configService.get('ADMIN_ID').split(',');
+
       if (!ctx.msg.from) {
         return await ctx.reply('Вийшла помилка спробуйте ще раз');
       }
 
-      const adminsID = this._configService.get('ADMIN_ID').split(',');
+      const isAdmin = adminsID.includes(ctx.msg.from.id.toString());
 
-      const userID = ctx.msg.from?.id.toString();
+      if (!isAdmin) return await ctx.reply('No access');
 
-      if (!adminsID.includes(userID)) {
-        return await ctx.reply('No access for this command');
-      }
-
-      return await ctx.reply('Закинь фото коли вони загрузяться напиши "готово"');
-    });
-
-    this.bot.on(':photo', (ctx) => {
-      if (!ctx.msg.photo || !ctx.msg.photo.length) {
-        return ctx.reply('Проблема із заватнаженням фото');
-      }
-
-      if (!ctx.session.images.length || ctx.session.images.length) ctx.session.images = [];
-
-      let largestObject = null;
-
-      for (const obj of ctx.msg.photo) {
-        if (!largestObject || (obj.file_size as number) > (largestObject.file_size as number)) {
-          largestObject = obj;
-        }
-      }
-
-      if (largestObject) {
-        ctx.session.images.push({
-          id: largestObject.file_unique_id,
-        });
-      } else {
-        return ctx.reply('Проблема із заватнаженням фото');
-      }
-
-      console.log(ctx.session.images);
-
-      return ctx.reply('Пиши готово якшо все ок');
-    });
-
-    this.bot.hears(readyRegex, (ctx) => {
-      ctx.reply('Супер пора ввести інші дані');
+      await ctx.conversation.enter('addProduct');
     });
   }
 }

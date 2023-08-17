@@ -1,8 +1,5 @@
+import { Conversation, ConversationFlavor } from '@grammyjs/conversations';
 import { Context, SessionFlavor } from 'grammy';
-
-interface IImages {
-  id: string;
-}
 
 export interface ISessionData {
   type: string;
@@ -12,7 +9,9 @@ export interface ISessionData {
   name: string;
   description: string;
   price: number;
-  images: IImages[];
+  images: { id: string }[];
 }
 
-export type IBotContext = Context & SessionFlavor<ISessionData>;
+export type IBotContext = Context & ConversationFlavor & SessionFlavor<ISessionData>;
+
+export type IBotConversation = Conversation<IBotContext>;

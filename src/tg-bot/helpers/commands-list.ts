@@ -1,1 +1,1 @@
-export const commandList = [{ command: 'start', description: 'Start the bot' }];
+export const commandList = [{ command: 'start', description: 'Старт бота' }];

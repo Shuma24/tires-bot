@@ -3,12 +3,14 @@ import { IProductService } from './interfaces/product-service.interface';
 import { ITires } from './interfaces/product.interface';
 import { TOKENS } from '../containter/tokens';
 import { ProductEntity } from './entity/product.entity';
-import { IProductRepository } from './interfaces/product-respository.interface';
+import { IProductRepository } from './interfaces/product-repository.interface';
 
 export class ProductService implements IProductService {
   constructor(private readonly _productRepository: IProductRepository) {}
 
-  async create(data: ITires): Promise<Omit<ITires, 'images'> | undefined> {
+  async create(
+    data: Omit<ITires, 'id' | 'images' | 'createdAt' | 'updatedAt'>,
+  ): Promise<Omit<ITires, 'images'> | undefined> {
     try {
       if (!data) throw new Error('No ');
 
@@ -35,6 +37,17 @@ export class ProductService implements IProductService {
       }
     }
   }
+
+  async createImage(listOfIds: { id: string }[], tiresID: number) {
+    try {
+      console.log(listOfIds, tiresID);
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      }
+    }
+  }
+
   async update(data: ITires): Promise<ITires | undefined> {
     if (!data) return undefined;
 
