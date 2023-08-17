@@ -6,6 +6,7 @@ import { BaseConversation } from '../conversation';
 import { TOKENS } from '../../containter/tokens';
 import { ILoggerService } from '../../common/interfaces/logger.service.interface';
 import { IProductService } from '../../product/interfaces/product-service.interface';
+import { productReplyGenerator } from './helpers/product-reply-generator';
 
 export class AddProductConversation extends BaseConversation {
   constructor(
@@ -24,8 +25,8 @@ export class AddProductConversation extends BaseConversation {
 
     const name = await conversation.waitFor('message');
 
-    if (!name.message.text) {
-      await ctx.reply('Ай, вводиш фігню то не текст.');
+    if (!name.message.text || name.message.text === 'exit') {
+      await ctx.reply('Виходмо не коректні дані або exit.');
       return;
     }
 
@@ -35,8 +36,8 @@ export class AddProductConversation extends BaseConversation {
 
     const description = await conversation.waitFor('message');
 
-    if (!description.message.text) {
-      await ctx.reply('Ай, вводиш фігню то не текст.');
+    if (!description.message.text || description.message.text === 'exit') {
+      await ctx.reply('Виходмо не коректні дані або exit.');
       return;
     }
 
@@ -44,12 +45,12 @@ export class AddProductConversation extends BaseConversation {
 
     const price = await conversation.waitFor('message');
 
-    if (!price.message.text) {
-      await ctx.reply('Ай, вводиш фігню то не текст.');
+    if (!price.message.text || isNaN(Number(price.message.text)) || price.message.text === 'exit') {
+      await ctx.reply('Виходмо не коректні дані або exit.');
       return;
     }
 
-    await ctx.reply('Обери будь ласка радіус', {
+    await ctx.reply('Обери будь ласка тип', {
       reply_markup: {
         keyboard: [[{ text: 'summer' }], [{ text: 'winter' }], [{ text: 'allseason' }]],
         resize_keyboard: true,
@@ -60,7 +61,7 @@ export class AddProductConversation extends BaseConversation {
     const type = await conversation.waitFor('message');
 
     if (!type.message.text) {
-      await ctx.reply('Ай, вводиш фігню.');
+      await ctx.reply('Ай, вводиш не це.');
       return;
     }
 
@@ -80,8 +81,12 @@ export class AddProductConversation extends BaseConversation {
 
     const radius = await conversation.waitFor('message');
 
-    if (!radius.message.text) {
-      await ctx.reply('Ай, вводиш фігню.');
+    if (
+      !radius.message.text ||
+      isNaN(Number(radius.message.text)) ||
+      radius.message.text === 'exit'
+    ) {
+      await ctx.reply('Виходмо не коректні дані або exit.');
       return;
     }
 
@@ -95,8 +100,8 @@ export class AddProductConversation extends BaseConversation {
 
     const width = await conversation.waitFor('message');
 
-    if (!width.message.text) {
-      await ctx.reply('Ай, вводиш фігню.');
+    if (!width.message.text || isNaN(Number(width.message.text)) || width.message.text === 'exit') {
+      await ctx.reply('Виходмо не коректні дані або exit.');
       return;
     }
 
@@ -116,8 +121,12 @@ export class AddProductConversation extends BaseConversation {
 
     const height = await conversation.waitFor('message');
 
-    if (!height.message.text) {
-      await ctx.reply('Ай, вводиш фігню.');
+    if (
+      !height.message.text ||
+      isNaN(Number(height.message.text)) ||
+      height.message.text === 'exit'
+    ) {
+      await ctx.reply('Виходмо не коректні дані або exit');
       return;
     }
 
@@ -140,7 +149,7 @@ export class AddProductConversation extends BaseConversation {
       return;
     }
 
-    await ctx.reply(`${product.id}`);
+    await ctx.reply(productReplyGenerator(product), { parse_mode: 'HTML' });
 
     return;
 

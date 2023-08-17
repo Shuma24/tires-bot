@@ -15,6 +15,7 @@ import { AddProduct } from '../commands/add-product/add.command';
 import { S3Storage } from '../storage/storage.service';
 import { FetchService } from '../fetch/fetch.service';
 import { AddProductConversation } from '../conversations/add-product/add.conversation';
+import { CancelCommand } from '../commands/cancel/cancel.command';
 
 export const container = new Container();
 
@@ -30,3 +31,4 @@ container.bind(TOKENS.addProductCommand).toInstance(AddProduct).inSingletonScope
 container.bind(TOKENS.storage).toInstance(S3Storage).inSingletonScope();
 container.bind(TOKENS.fetchService).toInstance(FetchService).inSingletonScope();
 container.bind(TOKENS.addProductConversation).toInstance(AddProductConversation).inSingletonScope();
+container.bind(TOKENS.cancelCommand).toInstance(CancelCommand).inSingletonScope();
