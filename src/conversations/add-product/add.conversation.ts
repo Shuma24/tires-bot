@@ -4,12 +4,12 @@ import { generateWidthTires } from '../../helpers/width-button.generator';
 import { IBotConversation, IBotContext } from '../../tg-bot/interface/bot-context.interface';
 import { BaseConversation } from '../conversation';
 import { TOKENS } from '../../containter/tokens';
-import { IProductRepository } from '../../product/interfaces/product-repository.interface';
 import { ILoggerService } from '../../common/interfaces/logger.service.interface';
+import { IProductService } from '../../product/interfaces/product-service.interface';
 
 export class AddProductConversation extends BaseConversation {
   constructor(
-    readonly _productRepository: IProductRepository,
+    readonly _productService: IProductService,
     private readonly _loggerService: ILoggerService,
   ) {
     super(_loggerService);
@@ -124,7 +124,7 @@ export class AddProductConversation extends BaseConversation {
     await ctx.reply('Так я буду створювати продукт, зачекай');
 
     const product = await conversation.external(() => {
-      return this._productRepository.create({
+      return this._productService.create({
         name: name.message.text as string,
         description: description.message.text as string,
         price: Number(price.message.text) as number,
@@ -135,7 +135,12 @@ export class AddProductConversation extends BaseConversation {
       });
     });
 
-    await ctx.reply(`${product.description}`);
+    if (!product) {
+      await ctx.reply('Помилка при додаванні продукту');
+      return;
+    }
+
+    await ctx.reply(`${product.id}`);
 
     return;
 
@@ -167,4 +172,4 @@ export class AddProductConversation extends BaseConversation {
   }
 }
 
-injected(AddProductConversation, TOKENS.productRepository, TOKENS.loggerService);
+injected(AddProductConversation, TOKENS.productService, TOKENS.loggerService);

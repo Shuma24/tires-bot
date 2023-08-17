@@ -9,7 +9,6 @@ import { IBotContext } from './interface/bot-context.interface';
 import { FileAdapter } from '@grammyjs/storage-file';
 import { commandList } from './helpers/commands-list';
 import { BaseConversation } from '../conversations/conversation';
-import { IProductRepository } from '../product/interfaces/product-repository.interface';
 
 export class myBot implements IBot {
   instance: Bot<IBotContext>;
@@ -18,7 +17,6 @@ export class myBot implements IBot {
   constructor(
     private readonly _configService: IConfigService,
     private readonly _addProductConversation: BaseConversation,
-    private readonly _productRepository: IProductRepository,
   ) {
     this.instance = new Bot(this._configService.get('BOT_SECRET'));
     this.instance.use(
@@ -48,7 +46,7 @@ export class myBot implements IBot {
 
     this.ListOfConversations.forEach((el) => {
       this.instance.use(
-        createConversation(el.handle.bind(this._productRepository), {
+        createConversation(el.handle.bind(el), {
           id: el.getName(),
         }),
       );
@@ -56,4 +54,4 @@ export class myBot implements IBot {
   }
 }
 
-injected(myBot, TOKENS.configService, TOKENS.addProductConversation, TOKENS.productRepository);
+injected(myBot, TOKENS.configService, TOKENS.addProductConversation);
