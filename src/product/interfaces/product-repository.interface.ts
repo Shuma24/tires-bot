@@ -1,9 +1,8 @@
-import { ITires } from './product.interface';
+import { ITires, ITiresImages, ITiresToCreate } from './product.interface';
 
 export interface IProductRepository {
-  create(
-    data: Omit<ITires, 'id' | 'images' | 'createdAt' | 'updatedAt'>,
-  ): Promise<Omit<ITires, 'images'>>;
+  create(data: ITiresToCreate): Promise<Omit<ITires, 'images'>>;
+  createImages(url: string, tiresId: number): Promise<ITiresImages>;
   //update(data: ITires): Promise<any>;
   // delete(data: ITires): Promise<any>;
 }

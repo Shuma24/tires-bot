@@ -105,7 +105,7 @@ export class AddProductConversation extends BaseConversation {
       return;
     }
 
-    await ctx.reply(`Останній вибір, висоти`, {
+    await ctx.reply(`Введи, висоту`, {
       reply_markup: {
         keyboard: [
           [{ text: '12.5' }, { text: '25' }, { text: '30' }],
@@ -130,17 +130,40 @@ export class AddProductConversation extends BaseConversation {
       return;
     }
 
+    await ctx.reply(`Введи, кількість`, {
+      reply_markup: {
+        keyboard: [
+          [{ text: '1' }, { text: '2' }],
+          [{ text: '3' }, { text: '4' }],
+        ],
+        resize_keyboard: true,
+        one_time_keyboard: true,
+      },
+    });
+
+    const quantity = await conversation.waitFor('message');
+
+    if (
+      !quantity.message.text ||
+      isNaN(Number(quantity.message.text)) ||
+      quantity.message.text === 'exit'
+    ) {
+      await ctx.reply('Виходмо не коректні дані або exit');
+      return;
+    }
+
     await ctx.reply('Так я буду створювати продукт, зачекай');
 
     const product = await conversation.external(() => {
       return this._productService.create({
         name: name.message.text as string,
         description: description.message.text as string,
-        price: Number(price.message.text) as number,
+        price: Number(price.message.text),
         type: type.message.text as string,
-        radius: Number(radius.message.text) as number,
-        width: Number(width.message.text) as number,
-        height: Number(height.message.text) as number,
+        radius: Number(radius.message.text),
+        width: Number(width.message.text),
+        height: Number(height.message.text),
+        quantity: Number(quantity.message.text),
       });
     });
 
@@ -151,19 +174,37 @@ export class AddProductConversation extends BaseConversation {
 
     await ctx.reply(productReplyGenerator(product), { parse_mode: 'HTML' });
 
-    return;
+    await ctx.reply('Будеш добавляти фото', {
+      reply_markup: {
+        keyboard: [[{ text: 'Так' }], [{ text: 'Ні' }]],
+        resize_keyboard: true,
+        one_time_keyboard: true,
+      },
+    });
 
-    /* await ctx.reply('Привіт грузи фотки');
+    const isHavePhoto = await conversation.waitFor('message');
+
+    if (
+      !isHavePhoto.message.text ||
+      isHavePhoto.message.text === 'Ні' ||
+      isHavePhoto.message.text !== 'Так'
+    ) {
+      await ctx.reply('Ок можна добавити потім');
+      return;
+    }
+
+    await ctx.reply('Кидай фото');
 
     const { message } = await conversation.waitFor(':photo');
 
-    if (!message?.photo) {
-      await ctx.reply('Це не фотографія! Я пішов!');
+    if (!message?.photo || message.text === 'exit') {
+      await ctx.reply('Проблема або exit');
       return;
     }
 
     let largestObject = null;
-    ctx.session.images = [];
+
+    conversation.session.images = [];
 
     for (const obj of message.photo) {
       if (!largestObject || (obj.file_size as number) > (largestObject.file_size as number)) {
@@ -172,12 +213,23 @@ export class AddProductConversation extends BaseConversation {
     }
 
     if (largestObject) {
-      ctx.session.images.push({
+      conversation.session.images.push({
         id: largestObject.file_id,
       });
     }
 
-    if (ctx.session.images.length) await ctx.reply(`${ctx.session.images[0].id}`); */
+    const images = await conversation.external(() => {
+      return this._productService.createImage(conversation.session.images, product.id);
+    });
+
+    if (!images) {
+      await ctx.reply('Помилка при додаванні фото');
+      return;
+    }
+
+    await ctx.reply('Фото додано дякую!');
+
+    return;
   }
 }
 

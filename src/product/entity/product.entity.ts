@@ -1,27 +1,26 @@
-import { ITires } from '../interfaces/product.interface';
+import { ITiresToCreate } from '../interfaces/product.interface';
 
-export class ProductEntity implements Omit<ITires, 'id' | 'images'> {
+export class ProductEntity implements ITiresToCreate {
   radius: number;
   width: number;
   height: number;
   type: string;
-  createdAt: Date | null;
-  updatedAt: Date | null;
   name: string;
   description: string;
   price: number;
+  quantity: number;
+  generatedSize: string;
 
-  constructor(data: Omit<ITires, 'id' | 'images'>) {
+  constructor(data: ITiresToCreate) {
     this.radius = data.radius;
-    this.type = data.type;
-    this.createdAt = data.createdAt;
     this.width = data.width;
     this.height = data.height;
-    this.createdAt = data.createdAt;
-    this.updatedAt = data.updatedAt;
+    this.type = data.type;
+    this.generatedSize = data.generatedSize;
     this.name = data.name;
     this.description = data.description;
     this.price = data.price;
+    this.quantity = data.quantity;
   }
 
   validateType(type: string) {
@@ -30,6 +29,12 @@ export class ProductEntity implements Omit<ITires, 'id' | 'images'> {
     } else {
       this.type = 'summer';
     }
+
+    return this;
+  }
+
+  createSize(width: number, height: number, radius: number) {
+    this.generatedSize = `${width}/${height}/${radius}`;
 
     return this;
   }

@@ -8,9 +8,8 @@ export const productReplyGenerator = (product: Omit<ITires, 'images'>) => {
     <b>description:</b> ${product.description};
     <b>price:</b> ${product.price} UAH;
     <b>type:</b> ${product.type};
-    <b>radius:</b> R${product.radius};
-    <b>width:</b> ${product.width};
-    <b>height:</b> ${product.height}`;
+    <b>size:</b> ${product.size};
+    <b>quantity:</b> ${product.quantity};`;
 
   return msg;
 };

@@ -13,9 +13,8 @@ model Tires {
   name        String
   description String
   price       Int
-  radius      Int
-  width       Int
-  height      Int
+  size        String
+  quantity    Int
   type        String
   createdAt   DateTime? @default(now())
   updatedAt   DateTime? @updatedAt
