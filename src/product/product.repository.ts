@@ -27,7 +27,7 @@ export class ProductRepository implements IProductRepository {
     return product;
   }
 
-  async createImages(url: string, tiresId: number): Promise<ITiresImages> {
+  async createImage(url: string, tiresId: number): Promise<ITiresImages> {
     const images = await this._orm.client.images.create({
       data: {
         tiresId: tiresId,
@@ -39,6 +39,9 @@ export class ProductRepository implements IProductRepository {
   }
 
   async getBySize(size: string, skip?: number): Promise<IGetProductsBySize> {
+    const pageSize = 3;
+    const skipPage = skip || 0;
+
     const products = await this._orm.client.tires.findMany({
       include: {
         images: true,
@@ -46,8 +49,8 @@ export class ProductRepository implements IProductRepository {
       where: {
         size: size,
       },
-      take: 3,
-      skip: skip ? skip : 0,
+      take: pageSize,
+      skip: pageSize * skipPage,
     });
 
     const total = await this._orm.client.tires.count({
@@ -56,12 +59,30 @@ export class ProductRepository implements IProductRepository {
       },
     });
 
+    const totalPages = Math.ceil(total / pageSize);
+
+    const currentPage = skipPage > totalPages ? totalPages : skipPage;
+
     return {
       data: products,
-      page: skip ? skip : 0,
+      page: currentPage,
       total: total,
-      lastPage: Math.ceil(total / 3) - 1,
+      lastPage: totalPages - 1,
     };
+  }
+
+  async getById(id: number): Promise<ITires | null> {
+    const product = await this._orm.client.tires.findFirst({
+      where: {
+        id: id,
+      },
+
+      include: {
+        images: true,
+      },
+    });
+
+    return product;
   }
 }
 

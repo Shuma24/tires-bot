@@ -9,11 +9,22 @@ import { generateWidthTires } from '../../helpers/width-button.generator';
 import { heightRegex, radiusRegex, typesRegex, widthRegex } from '../helpers/regexs';
 import { checkType } from '../helpers/type-selector';
 import { handleBackHomeButtons } from '../helpers/back-home.handle';
-import { generateSelection } from '../helpers/generate-selection';
+
 import { IProductService } from '../../product/interfaces/product-service.interface';
 import { CallbackQueryContext, CommandContext, HearsContext, InlineKeyboard } from 'grammy';
 import { InlineKeyboardButton } from 'grammy/types';
 import { IBotContext } from '../../tg-bot/interface/bot-context.interface';
+import {
+  askAboutHeight,
+  askAboutRadius,
+  askAboutSeasonType,
+  askAboutWidth,
+  contactsFromMainMenu,
+  noTiresLength,
+  onlyOnePageTires,
+  productDescriptionGenerate,
+  workOnYouReq,
+} from '../helpers/start-command-text';
 
 export class StartCommand extends Command {
   constructor(
@@ -25,6 +36,20 @@ export class StartCommand extends Command {
   }
 
   handle(): void {
+    //sub-command navigation
+    this.startCommand();
+    this.listenContacts();
+    this.xPartGenerate();
+    this.seasonMenu();
+    this.radiusMenuAndSetSeason();
+    this.widthGenerateAndSetRadius();
+    this.heightGenerateAndSetWidth();
+    this.setHeightAndTriggerDB();
+    this.productPaginationCallback();
+    this.photoPaginationCallback();
+  }
+
+  private startCommand() {
     this.bot.command('start', async (ctx) => {
       //start generate
       await ctx.reply('Привіт ✌🏻');
@@ -37,23 +62,26 @@ export class StartCommand extends Command {
         },
       });
     });
+  }
 
-    //contacts generate
+  private listenContacts() {
     this.bot.hears('📞 Контакти', (ctx) => {
-      ctx.reply(`Наші номера телефонів: 
-      +380XXXXXXXXX 📞;
-      +380XXXXXXXXX 📞;
-      +380XXXXXXXXX 📞.`);
+      ctx.reply(contactsFromMainMenu, {
+        parse_mode: 'HTML',
+      });
     });
+  }
 
-    //web page generate
+  private xPartGenerate() {
     this.bot.hears('Корисний лінк для авто', (ctx) => {
       ctx.reply('https://xpart.in.ua/');
     });
+  }
 
-    //types generate
+  private seasonMenu() {
     this.bot.hears('🔍 Підібрати шини', async (ctx) => {
-      await ctx.reply('Шини якого сезону Вам потрібні?', {
+      await ctx.reply(askAboutSeasonType, {
+        parse_mode: 'HTML',
         reply_markup: {
           keyboard: seasonButtons,
           one_time_keyboard: true,
@@ -61,10 +89,13 @@ export class StartCommand extends Command {
         },
       });
     });
+  }
 
-    //radius generate
+  private radiusMenuAndSetSeason() {
     this.bot.hears(typesRegex, async (ctx) => {
-      const response = handleBackHomeButtons(ctx.msg.text as string);
+      if (!ctx.msg.text) return await ctx.reply('Вийшла помилка спробуйте ще раз');
+
+      const response = handleBackHomeButtons(ctx.msg.text);
 
       if (response) {
         return await ctx.reply(response.text, {
@@ -75,11 +106,12 @@ export class StartCommand extends Command {
         });
       }
 
-      const checkedType = checkType(ctx.msg.text as string);
+      const checkedType = checkType(ctx.msg.text);
 
       checkedType && (ctx.session.type = checkedType);
 
-      await ctx.reply('Оберіть ДІАМЕТР', {
+      await ctx.reply(askAboutRadius, {
+        parse_mode: 'HTML',
         reply_markup: {
           keyboard: radiusButtons,
           one_time_keyboard: true,
@@ -87,12 +119,11 @@ export class StartCommand extends Command {
         },
       });
     });
+  }
 
-    // width generate
+  private widthGenerateAndSetRadius() {
     this.bot.hears(radiusRegex, async (ctx) => {
-      if (!ctx.msg.text) {
-        return await ctx.reply('Вийшла помилка спробуйте ще раз');
-      }
+      if (!ctx.msg.text) return await ctx.reply('Вийшла помилка спробуйте ще раз');
 
       const response = handleBackHomeButtons(ctx.msg.text as string);
 
@@ -111,7 +142,8 @@ export class StartCommand extends Command {
 
       const widthButtons = generateWidthTires(radius);
 
-      ctx.reply('Оберіть ШИРИНУ', {
+      ctx.reply(askAboutWidth, {
+        parse_mode: 'HTML',
         reply_markup: {
           keyboard: widthButtons,
           one_time_keyboard: true,
@@ -119,8 +151,9 @@ export class StartCommand extends Command {
         },
       });
     });
+  }
 
-    //height generate
+  private heightGenerateAndSetWidth() {
     this.bot.hears(widthRegex, async (ctx) => {
       if (!ctx.msg.text) {
         return await ctx.reply('Вийшла помилка спробуйте ще раз');
@@ -139,7 +172,8 @@ export class StartCommand extends Command {
         });
       }
 
-      ctx.reply('Оберіть потрібну ВИСОТУ ПРОФІЛЯ', {
+      ctx.reply(askAboutHeight, {
+        parse_mode: 'HTML',
         reply_markup: {
           keyboard: heightButtons,
           one_time_keyboard: true,
@@ -147,13 +181,9 @@ export class StartCommand extends Command {
         },
       });
     });
+  }
 
-    this.bot.callbackQuery(/page_(\d+)/, async (ctx) => {
-      ctx.session.pages = parseInt(ctx.match[1], 10);
-
-      await this.handleProducts(ctx);
-    });
-
+  private setHeightAndTriggerDB() {
     this.bot.hears(heightRegex, async (ctx) => {
       if (!ctx.msg.text) {
         return await ctx.reply('Вийшла помилка спробуйте ще раз');
@@ -174,13 +204,7 @@ export class StartCommand extends Command {
         });
       }
 
-      if (!ctx.session.radius || !ctx.session.type || !ctx.session.width || !ctx.session.height) {
-        return await ctx.reply('Ви пропустили щось обрати..');
-      }
-
-      const size = `${ctx.session.width}/${ctx.session.height}/${ctx.session.radius}`;
-
-      await ctx.reply(generateSelection(size, ctx.session.type), {
+      await ctx.reply(workOnYouReq, {
         parse_mode: 'HTML',
         reply_markup: {
           remove_keyboard: true,
@@ -191,24 +215,122 @@ export class StartCommand extends Command {
     });
   }
 
-  private async handleProducts(ctx: HearsContext<IBotContext> | CallbackQueryContext<IBotContext>) {
-    const size = `${ctx.session.width}/${ctx.session.height}/${ctx.session.radius}`;
+  private productPaginationCallback() {
+    this.bot.callbackQuery(/page_(\d+)/, async (ctx) => {
+      ctx.session.pages = parseInt(ctx.match[1], 10);
 
+      await this.handleProducts(ctx);
+    });
+  }
+
+  private photoPaginationCallback() {
+    this.bot.callbackQuery(/img_(\d+)_(\d+)/, async (ctx) => {
+      const productId = parseInt(ctx.match[1], 10);
+
+      const photoIndex = parseInt(ctx.match[2], 10);
+
+      const product = await this._productService.getById(productId);
+
+      if (!product || !product.images) return await ctx.reply('Сталась проблема спробуйте ще раз.');
+
+      const totalPhotos = product.images.length;
+
+      let nextIndex = (photoIndex + 1) % totalPhotos;
+      let prevIndex = (photoIndex - 1 + totalPhotos) % totalPhotos;
+
+      const caption = productDescriptionGenerate(
+        product.name,
+        product.size,
+        product.description,
+        product.quantity,
+        product.price,
+      );
+
+      const photoUrl =
+        product.images[photoIndex].url ||
+        'https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg';
+
+      await ctx.editMessageMedia(
+        {
+          type: 'photo',
+          media: photoUrl,
+          caption: caption,
+          parse_mode: 'HTML',
+        },
+        {
+          reply_markup: {
+            inline_keyboard: [
+              [
+                { text: '⬅️ Попереднє', callback_data: `img_${product.id}_${prevIndex}}` },
+                { text: 'Наступне ➡️', callback_data: `img_${product.id}_${nextIndex}` },
+              ],
+              [{ text: `Замовити ${product.name}`, callback_data: `order_${productId}` }],
+            ],
+          },
+        },
+      );
+    });
+  }
+
+  private async handleProducts(ctx: HearsContext<IBotContext> | CallbackQueryContext<IBotContext>) {
+    if (!ctx.session.radius || !ctx.session.type || !ctx.session.width || !ctx.session.height) {
+      return await ctx.reply('Ви пропустили щось обрати..');
+    }
+
+    const size = `${ctx.session.width}/${ctx.session.height}/${ctx.session.radius}`;
     const products = await this._productService.getBySize(size, ctx.session.pages);
 
     if (!products || !products.data.length) {
-      await ctx.reply('Нажаль такого розміру немає');
-      return;
+      return await ctx.reply(noTiresLength);
+    }
+
+    for (let product of products.data) {
+      const captionText = productDescriptionGenerate(
+        product.name,
+        product.size,
+        product.description,
+        product.quantity,
+        product.price,
+      );
+
+      let mainButton: InlineKeyboardButton = {
+        text: `Замовити ${product.name}`,
+        callback_data: `order_${product.id}`,
+      };
+
+      let imageButtons: InlineKeyboardButton[] = [];
+
+      if (product.images && product.images.length > 0) {
+        let currentImageIndex = 0;
+        let nextImageIndex = (currentImageIndex + 1) % product.images.length;
+
+        imageButtons.push({
+          text: `Наступне фото 👉🏻`,
+          callback_data: `img_${product.id}_${nextImageIndex}`,
+        });
+
+        await ctx.replyWithPhoto(
+          product.images[0].url ||
+            'https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg',
+          {
+            caption: captionText,
+            parse_mode: 'HTML',
+            reply_markup: {
+              inline_keyboard: [imageButtons, [mainButton]],
+            },
+          },
+        );
+      } else {
+        await ctx.reply(captionText, {
+          parse_mode: 'HTML',
+          reply_markup: {
+            inline_keyboard: [[mainButton]],
+          },
+        });
+      }
     }
 
     const buttonRow: InlineKeyboardButton[][] = [];
-    let msg = '';
-
-    products.data.forEach((product) => {
-      msg += `${product.name}/${product.size}\n${product.description}\n\n`;
-      buttonRow.push([{ text: `Замовити ${product.name}`, callback_data: `order_${product.id}` }]);
-    });
-
     if (ctx.session.pages > 0) {
       buttonRow.push([{ text: 'Назад', callback_data: `page_${ctx.session.pages - 1}` }]);
     }
@@ -217,7 +339,13 @@ export class StartCommand extends Command {
       buttonRow.push([{ text: 'Вперед', callback_data: `page_${ctx.session.pages + 1}` }]);
     }
 
-    await ctx.reply(msg, {
+    if (products.total <= 3) {
+      return await ctx.reply(onlyOnePageTires, {
+        parse_mode: 'HTML',
+      });
+    }
+
+    await ctx.reply('Це не все, переглянь наступну сторінку', {
       reply_markup: {
         inline_keyboard: buttonRow,
       },

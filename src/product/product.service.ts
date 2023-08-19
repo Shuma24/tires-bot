@@ -66,63 +66,52 @@ export class ProductService implements IProductService {
     }
   }
 
-  async createImage(
-    listOfIds: IPhotosIDTelegram[],
-    tiresID: number,
-  ): Promise<ITiresImages[] | undefined> {
+  async createImage(id: string, tiresID: number): Promise<ITiresImages | undefined> {
     try {
       const token = this._configService.get('BOT_SECRET');
-
-      let arrWithPath: string[] = [];
-
-      let linksToPhoto: string[] = [];
-
-      let listOfImages: ITiresImages[] = [];
 
       if (!token) {
         this._loggerService.error('Problems with get token from .env');
         throw new Error('Problems with get token from .env');
       }
 
-      for (let i = 0; i < listOfIds.length; i++) {
-        const pathFileLink = `https://api.telegram.org/bot${token}/getFile?file_id=${listOfIds[i].id}`;
+      const responseWithPath = await this._fetchService.GET<IResTGPath>(
+        `https://api.telegram.org/bot${token}/getFile?file_id=${id}`,
+      );
 
-        const { data } = await this._fetchService.GET<IResTGPath>(pathFileLink);
-
-        if (!data) return;
-
-        arrWithPath = [...arrWithPath, data.result.file_path];
+      if (!responseWithPath.data.result.file_path) {
+        this._loggerService.error('No path to download image');
+        throw new Error('No path to download image');
       }
 
-      if (!arrWithPath.length) throw new Error('No path to download image from telegram');
-
-      for (let i = 0; i < arrWithPath.length; i++) {
-        const pathToDownload = `https://api.telegram.org/file/bot${token}/${arrWithPath[i]}`;
-
-        const { data } = await this._fetchService.GET<Buffer>(pathToDownload, {
+      const responseWithBuffer = await this._fetchService.GET<Buffer>(
+        `https://api.telegram.org/file/bot${token}/${responseWithPath.data.result.file_path}`,
+        {
           responseType: 'arraybuffer',
-        });
+        },
+      );
 
-        const uploadedPhoto = await this._storageService.handleFile({
-          data: data,
-          filename: 'tires-bot',
-          encoding: 'utf8',
-          mimetype: 'image/jpeg',
-          limit: false,
-        });
-
-        if (!uploadedPhoto) return;
-
-        linksToPhoto = [...linksToPhoto, uploadedPhoto.url];
+      if (!responseWithBuffer.data) {
+        this._loggerService.error('No buffer from telegram');
+        throw new Error('No buffer from telegram');
       }
 
-      for (let i = 0; i < linksToPhoto.length; i++) {
-        const image = await this._productRepository.createImages(linksToPhoto[i], tiresID);
+      const uploadedPhoto = await this._storageService.handleFile({
+        data: responseWithBuffer.data,
+        filename: 'tires-bot',
+        encoding: 'utf8',
+        mimetype: 'image/jpeg',
+        limit: false,
+      });
 
-        listOfImages = [...listOfImages, image];
+      if (!uploadedPhoto) {
+        this._loggerService.error('Problem with upload to cloud');
+        throw new Error('Problem with upload to cloud');
       }
 
-      return listOfImages;
+      const image = await this._productRepository.createImage(uploadedPhoto.url, tiresID);
+
+      return image;
     } catch (error) {
       if (error instanceof Error) {
         this._loggerService.error(error.message);
@@ -151,6 +140,29 @@ export class ProductService implements IProductService {
       const products = await this._productRepository.getBySize(size, page);
 
       return products;
+    } catch (error) {
+      if (error instanceof Error) {
+        this._loggerService.error(error.message);
+        throw new Error(error.message);
+      }
+    }
+  }
+
+  async getById(id: number): Promise<ITires | undefined> {
+    try {
+      if (!id) {
+        this._loggerService.error('No id');
+        throw new Error('No id');
+      }
+
+      const product = await this._productRepository.getById(id);
+
+      if (!product) {
+        this._loggerService.error('Bad ID or another problem');
+        throw new Error('Bad ID or another problem');
+      }
+
+      return product;
     } catch (error) {
       if (error instanceof Error) {
         this._loggerService.error(error.message);

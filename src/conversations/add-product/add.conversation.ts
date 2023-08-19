@@ -217,20 +217,21 @@ export class AddProductConversation extends BaseConversation {
 
     await ctx.reply(`Кидай ${count.message.text} фото`);
 
-    while (Number(count.message.text) >= conversation.session.images.length - 1) {
-      const { message } = await conversation.wait();
+    let i = 0;
+
+    while (Number(count.message.text) >= i) {
+      const { message } = await conversation.waitFor(':photo');
 
       if (!message?.photo || message.text === 'exit') {
         await ctx.reply('Проблема або exit');
         return;
       }
 
-      (conversation.session.images as { id: string }[]).push({
-        id: message.photo[message.photo.length - 1].file_id,
-      });
-
       const images = await conversation.external(() => {
-        return this._productService.createImage(conversation.session.images, product.id);
+        return this._productService.createImage(
+          message.photo[message.photo.length - 1].file_id,
+          product.id,
+        );
       });
 
       if (!images) {
@@ -238,12 +239,10 @@ export class AddProductConversation extends BaseConversation {
         return;
       }
 
-      await ctx.reply(`Фото №${conversation.session.images.length} додано`);
+      await ctx.reply(`Фото ${images.id} додано`);
 
-      if (Number(count.message.text) === conversation.session.images.length - 1) return;
+      i++;
     }
-
-    conversation.session.images = [];
 
     return;
   }
