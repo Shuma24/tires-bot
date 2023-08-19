@@ -9,12 +9,19 @@ import { generateWidthTires } from '../../helpers/width-button.generator';
 import { heightRegex, radiusRegex, typesRegex, widthRegex } from '../helpers/regexs';
 import { checkType } from '../helpers/type-selector';
 import { handleBackHomeButtons } from '../helpers/back-home.handle';
+import { generateSelection } from '../helpers/generate-selection';
+import { IProductService } from '../../product/interfaces/product-service.interface';
+import { CallbackQueryContext, CommandContext, HearsContext, InlineKeyboard } from 'grammy';
+import { InlineKeyboardButton } from 'grammy/types';
+import { IBotContext } from '../../tg-bot/interface/bot-context.interface';
 
 export class StartCommand extends Command {
-  constructor(protected readonly _bot: IBot, private readonly _loggerService: ILoggerService) {
-    super(_bot.instance);
-
-    this._loggerService.info('Start command initialized');
+  constructor(
+    protected readonly _bot: IBot,
+    private readonly _loggerService: ILoggerService,
+    private readonly _productService: IProductService,
+  ) {
+    super(_bot.instance, _loggerService);
   }
 
   handle(): void {
@@ -141,6 +148,12 @@ export class StartCommand extends Command {
       });
     });
 
+    this.bot.callbackQuery(/page_(\d+)/, async (ctx) => {
+      ctx.session.pages = parseInt(ctx.match[1], 10);
+
+      await this.handleProducts(ctx);
+    });
+
     this.bot.hears(heightRegex, async (ctx) => {
       if (!ctx.msg.text) {
         return await ctx.reply('Вийшла помилка спробуйте ще раз');
@@ -150,24 +163,66 @@ export class StartCommand extends Command {
 
       const radius = ctx.session.radius || 21;
 
-      const response = handleBackHomeButtons(ctx.msg.text, radius);
+      const heightResponse = handleBackHomeButtons(ctx.msg.text, radius);
 
-      if (response) {
-        return await ctx.reply(response.text, {
+      if (heightResponse) {
+        return await ctx.reply(heightResponse.text, {
           reply_markup: {
-            keyboard: response.buttons,
+            keyboard: heightResponse.buttons,
             resize_keyboard: true,
           },
         });
       }
 
-      ctx.reply('Дякую шукаю варіанти', {
+      if (!ctx.session.radius || !ctx.session.type || !ctx.session.width || !ctx.session.height) {
+        return await ctx.reply('Ви пропустили щось обрати..');
+      }
+
+      const size = `${ctx.session.width}/${ctx.session.height}/${ctx.session.radius}`;
+
+      await ctx.reply(generateSelection(size, ctx.session.type), {
+        parse_mode: 'HTML',
         reply_markup: {
           remove_keyboard: true,
         },
       });
+
+      this.handleProducts(ctx);
+    });
+  }
+
+  private async handleProducts(ctx: HearsContext<IBotContext> | CallbackQueryContext<IBotContext>) {
+    const size = `${ctx.session.width}/${ctx.session.height}/${ctx.session.radius}`;
+
+    const products = await this._productService.getBySize(size, ctx.session.pages);
+
+    if (!products || !products.data.length) {
+      await ctx.reply('Нажаль такого розміру немає');
+      return;
+    }
+
+    const buttonRow: InlineKeyboardButton[][] = [];
+    let msg = '';
+
+    products.data.forEach((product) => {
+      msg += `${product.name}/${product.size}\n${product.description}\n\n`;
+      buttonRow.push([{ text: `Замовити ${product.name}`, callback_data: `order_${product.id}` }]);
+    });
+
+    if (ctx.session.pages > 0) {
+      buttonRow.push([{ text: 'Назад', callback_data: `page_${ctx.session.pages - 1}` }]);
+    }
+
+    if (ctx.session.pages < products.lastPage) {
+      buttonRow.push([{ text: 'Вперед', callback_data: `page_${ctx.session.pages + 1}` }]);
+    }
+
+    await ctx.reply(msg, {
+      reply_markup: {
+        inline_keyboard: buttonRow,
+      },
     });
   }
 }
 
-injected(StartCommand, TOKENS.bot, TOKENS.loggerService);
+injected(StartCommand, TOKENS.bot, TOKENS.loggerService, TOKENS.productService);

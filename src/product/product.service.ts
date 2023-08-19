@@ -1,6 +1,7 @@
 import { injected } from 'brandi';
 import { IProductService } from './interfaces/product-service.interface';
 import {
+  IGetProductsBySize,
   IPhotosIDTelegram,
   ITires,
   ITiresImages,
@@ -13,6 +14,7 @@ import { IConfigService } from '../common/interfaces/config.service.interface';
 import { IFetchService } from '../fetch/interfaces/fetch.interface';
 import { IResTGPath } from './interfaces/response.interface';
 import { IStorage } from '../storage/interfaces/storage.interfaces';
+import { ILoggerService } from '../common/interfaces/logger.service.interface';
 
 export class ProductService implements IProductService {
   constructor(
@@ -20,13 +22,19 @@ export class ProductService implements IProductService {
     private readonly _configService: IConfigService,
     private readonly _fetchService: IFetchService,
     private readonly _storageService: IStorage,
-  ) {}
+    private readonly _loggerService: ILoggerService,
+  ) {
+    this._loggerService.info('ProductService initialized');
+  }
 
   async create(
     data: Omit<ITiresToCreate, 'generatedSize'>,
   ): Promise<Omit<ITires, 'images'> | undefined> {
     try {
-      if (!data) throw new Error('No data');
+      if (!data) {
+        this._loggerService.error('No data');
+        throw new Error('No data');
+      }
 
       const newTires = new ProductEntity({
         name: data.name,
@@ -44,11 +52,15 @@ export class ProductService implements IProductService {
 
       const createdTire = await this._productRepository.create(newTires);
 
-      if (!createdTire) throw new Error('Problems with create product');
+      if (!createdTire) {
+        this._loggerService.error('Problems with create product');
+        throw new Error('Problems with create product');
+      }
 
       return createdTire;
     } catch (error) {
       if (error instanceof Error) {
+        this._loggerService.error(error.message);
         throw new Error(error.message);
       }
     }
@@ -61,15 +73,16 @@ export class ProductService implements IProductService {
     try {
       const token = this._configService.get('BOT_SECRET');
 
-      // get tires by ID check
-
       let arrWithPath: string[] = [];
 
       let linksToPhoto: string[] = [];
 
       let listOfImages: ITiresImages[] = [];
 
-      if (!token) throw new Error('Problems with get token from .env');
+      if (!token) {
+        this._loggerService.error('Problems with get token from .env');
+        throw new Error('Problems with get token from .env');
+      }
 
       for (let i = 0; i < listOfIds.length; i++) {
         const pathFileLink = `https://api.telegram.org/bot${token}/getFile?file_id=${listOfIds[i].id}`;
@@ -112,6 +125,7 @@ export class ProductService implements IProductService {
       return listOfImages;
     } catch (error) {
       if (error instanceof Error) {
+        this._loggerService.error(error.message);
         throw new Error(error.message);
       }
     }
@@ -126,6 +140,24 @@ export class ProductService implements IProductService {
     const test = Boolean(id);
     return test;
   }
+
+  async getBySize(size: string, page?: number): Promise<IGetProductsBySize | undefined> {
+    try {
+      if (!size) {
+        this._loggerService.error('No size');
+        throw new Error('Size is required.');
+      }
+
+      const products = await this._productRepository.getBySize(size, page);
+
+      return products;
+    } catch (error) {
+      if (error instanceof Error) {
+        this._loggerService.error(error.message);
+        throw new Error(error.message);
+      }
+    }
+  }
 }
 
 injected(
@@ -134,4 +166,5 @@ injected(
   TOKENS.configService,
   TOKENS.fetchService,
   TOKENS.storage,
+  TOKENS.loggerService,
 );

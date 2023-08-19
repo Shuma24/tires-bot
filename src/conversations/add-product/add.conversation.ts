@@ -193,41 +193,57 @@ export class AddProductConversation extends BaseConversation {
       return;
     }
 
-    await ctx.reply('Кидай фото');
-
-    const { message } = await conversation.waitFor(':photo');
-
-    if (!message?.photo || message.text === 'exit') {
-      await ctx.reply('Проблема або exit');
-      return;
-    }
-
-    let largestObject = null;
-
     conversation.session.images = [];
 
-    for (const obj of message.photo) {
-      if (!largestObject || (obj.file_size as number) > (largestObject.file_size as number)) {
-        largestObject = obj;
-      }
-    }
-
-    if (largestObject) {
-      conversation.session.images.push({
-        id: largestObject.file_id,
-      });
-    }
-
-    const images = await conversation.external(() => {
-      return this._productService.createImage(conversation.session.images, product.id);
+    await ctx.reply('Вибери скільки фото будеш добавляти', {
+      reply_markup: {
+        keyboard: [[{ text: '1' }, { text: '2' }], [{ text: '3' }, { text: '4' }], [{ text: '5' }]],
+        resize_keyboard: true,
+        one_time_keyboard: true,
+      },
     });
 
-    if (!images) {
-      await ctx.reply('Помилка при додаванні фото');
+    const count = await conversation.waitFor('message');
+
+    if (
+      !count.message.text ||
+      isNaN(Number(count.message.text)) ||
+      count.message.text === 'exit' ||
+      Number(count.message.text) > 5
+    ) {
+      await ctx.reply('Не число або exit. А також максимум 5 фото');
       return;
     }
 
-    await ctx.reply('Фото додано дякую!');
+    await ctx.reply(`Кидай ${count.message.text} фото`);
+
+    while (Number(count.message.text) >= conversation.session.images.length - 1) {
+      const { message } = await conversation.wait();
+
+      if (!message?.photo || message.text === 'exit') {
+        await ctx.reply('Проблема або exit');
+        return;
+      }
+
+      (conversation.session.images as { id: string }[]).push({
+        id: message.photo[message.photo.length - 1].file_id,
+      });
+
+      const images = await conversation.external(() => {
+        return this._productService.createImage(conversation.session.images, product.id);
+      });
+
+      if (!images) {
+        await ctx.reply('Помилка при додаванні фото');
+        return;
+      }
+
+      await ctx.reply(`Фото №${conversation.session.images.length} додано`);
+
+      if (Number(count.message.text) === conversation.session.images.length - 1) return;
+    }
+
+    conversation.session.images = [];
 
     return;
   }

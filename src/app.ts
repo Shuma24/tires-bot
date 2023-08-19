@@ -15,9 +15,9 @@ export class Application {
     private readonly _startCommand: Command,
     private readonly _ormService: IORMService,
     private readonly _addProductCommand: Command,
-    private readonly _cancelCommand: Command,
+    private readonly _imageCommand: Command,
   ) {
-    this.commands = [_startCommand, _addProductCommand, _cancelCommand];
+    this.commands = [_startCommand, _addProductCommand, _imageCommand];
   }
 
   initCommands() {
@@ -54,5 +54,5 @@ injected(
   TOKENS.startCommand,
   TOKENS.ormService,
   TOKENS.addProductCommand,
-  TOKENS.cancelCommand,
+  TOKENS.imageCommand,
 );

@@ -29,7 +29,8 @@ export class myBot implements IBot {
           price: 0,
           description: '',
           height: 0,
-          images: [{ id: '' }],
+          images: [],
+          pages: 0,
         }),
         storage: enhanceStorage({
           storage: new FileAdapter({

@@ -13,7 +13,7 @@ export class AddProduct extends Command {
     private readonly _loggerService: ILoggerService,
     private readonly _configService: IConfigService,
   ) {
-    super(_bot.instance);
+    super(_bot.instance, _loggerService);
 
     this._loggerService.info('Add Product command initialized');
   }

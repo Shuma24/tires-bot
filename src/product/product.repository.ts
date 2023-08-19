@@ -2,7 +2,12 @@ import { injected } from 'brandi';
 import { TOKENS } from '../containter/tokens';
 import { IORMService } from '../dataBase/orm.interface';
 import { IProductRepository } from './interfaces/product-repository.interface';
-import { ITires, ITiresImages, ITiresToCreate } from './interfaces/product.interface';
+import {
+  IGetProductsBySize,
+  ITires,
+  ITiresImages,
+  ITiresToCreate,
+} from './interfaces/product.interface';
 
 export class ProductRepository implements IProductRepository {
   constructor(private readonly _orm: IORMService) {}
@@ -31,6 +36,32 @@ export class ProductRepository implements IProductRepository {
     });
 
     return images;
+  }
+
+  async getBySize(size: string, skip?: number): Promise<IGetProductsBySize> {
+    const products = await this._orm.client.tires.findMany({
+      include: {
+        images: true,
+      },
+      where: {
+        size: size,
+      },
+      take: 3,
+      skip: skip ? skip : 0,
+    });
+
+    const total = await this._orm.client.tires.count({
+      where: {
+        size: size,
+      },
+    });
+
+    return {
+      data: products,
+      page: skip ? skip : 0,
+      total: total,
+      lastPage: Math.ceil(total / 3) - 1,
+    };
   }
 }
 

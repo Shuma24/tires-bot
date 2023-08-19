@@ -13,7 +13,7 @@ export interface ITiresToCreate {
 export interface ITires {
   id: number;
   name: string;
-  images: ITiresImages[];
+  images?: ITiresImages[];
   description: string;
   price: number;
   size: string;
@@ -32,4 +32,11 @@ export interface ITiresImages {
   url: string;
   createdAt: Date | null;
   updatedAt: Date | null;
+}
+
+export interface IGetProductsBySize {
+  data: ITires[];
+  total: number;
+  page: number;
+  lastPage: number;
 }
