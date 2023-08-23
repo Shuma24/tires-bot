@@ -84,6 +84,39 @@ export class ProductRepository implements IProductRepository {
 
     return product;
   }
+
+  async delete(id: number): Promise<boolean> {
+    const del = await this._orm.client.tires.delete({
+      where: {
+        id: id,
+      },
+    });
+
+    return del.id ? true : false;
+  }
+
+  async update(
+    data: {
+      name?: string | undefined;
+      description?: string | undefined;
+      price?: number | undefined;
+      size?: string | undefined;
+      quantity?: number | undefined;
+      type?: string | undefined;
+    },
+    productID: number,
+  ): Promise<ITires> {
+    const updatedProduct = await this._orm.client.tires.update({
+      where: {
+        id: productID,
+      },
+      data: {
+        ...data,
+      },
+    });
+
+    return updatedProduct;
+  }
 }
 
 injected(ProductRepository, TOKENS.ormService);

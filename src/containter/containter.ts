@@ -15,7 +15,11 @@ import { AddProduct } from '../commands/add-product/add.command';
 import { S3Storage } from '../storage/storage.service';
 import { FetchService } from '../fetch/fetch.service';
 import { AddProductConversation } from '../conversations/add-product/add.conversation';
-import { ImageCommand } from '../commands/image/cancel.command';
+import { ImageCommand } from '../commands/image/image.command';
+import { OrderProductsConversation } from '../conversations/order-product/order.conversation';
+import { SetProductsImageConversation } from '../conversations/set-product-image/set-product-image.conversation';
+import { DeleteProduct } from '../commands/del/del.command';
+import { DeleteProductConversation } from '../conversations/del-product/delete.conversation';
 
 export const container = new Container();
 
@@ -32,3 +36,16 @@ container.bind(TOKENS.storage).toInstance(S3Storage).inSingletonScope();
 container.bind(TOKENS.fetchService).toInstance(FetchService).inSingletonScope();
 container.bind(TOKENS.addProductConversation).toInstance(AddProductConversation).inSingletonScope();
 container.bind(TOKENS.imageCommand).toInstance(ImageCommand).inSingletonScope();
+container
+  .bind(TOKENS.orderProductConversation)
+  .toInstance(OrderProductsConversation)
+  .inSingletonScope();
+container
+  .bind(TOKENS.SetProductsImageConversation)
+  .toInstance(SetProductsImageConversation)
+  .inSingletonScope();
+container.bind(TOKENS.DeleteProductCommand).toInstance(DeleteProduct).inSingletonScope();
+container
+  .bind(TOKENS.DeleteProductConversation)
+  .toInstance(DeleteProductConversation)
+  .inSingletonScope();

@@ -11,6 +11,16 @@ export interface IProductService {
   createImage(id: string, tiresID: number): Promise<ITiresImages | undefined>;
   getBySize(size: string, page?: number): Promise<IGetProductsBySize | undefined>;
   getById(id: number): Promise<ITires | undefined>;
-  update(data: ITires): Promise<ITires | undefined>;
-  delete(id: number): boolean;
+  update(
+    data: {
+      name?: string;
+      description?: string;
+      price?: number;
+      size?: string;
+      quantity?: number;
+      type?: string;
+    },
+    productID: number,
+  ): Promise<ITires | undefined>;
+  delete(id: number): Promise<boolean | undefined>;
 }

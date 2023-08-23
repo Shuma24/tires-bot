@@ -10,7 +10,7 @@ export interface ISessionData {
   description: string;
   price: number;
   pages: number;
-  images: [];
+  productOrOrder: number;
 }
 
 export type IBotContext = Context & ConversationFlavor & SessionFlavor<ISessionData>;

@@ -30,8 +30,6 @@ export class AddProductConversation extends BaseConversation {
       return;
     }
 
-    ctx.session.name = name.message.text;
-
     await ctx.reply('Тепер напиши опис до коліс');
 
     const description = await conversation.waitFor('message');
@@ -130,7 +128,7 @@ export class AddProductConversation extends BaseConversation {
       return;
     }
 
-    await ctx.reply(`Введи, кількість`, {
+    await ctx.reply(`Коліс в наявності?`, {
       reply_markup: {
         keyboard: [
           [{ text: '1' }, { text: '2' }],
@@ -193,8 +191,6 @@ export class AddProductConversation extends BaseConversation {
       return;
     }
 
-    conversation.session.images = [];
-
     await ctx.reply('Вибери скільки фото будеш добавляти', {
       reply_markup: {
         keyboard: [[{ text: '1' }, { text: '2' }], [{ text: '3' }, { text: '4' }], [{ text: '5' }]],
@@ -239,7 +235,7 @@ export class AddProductConversation extends BaseConversation {
         return;
       }
 
-      await ctx.reply(`Фото ${images.id} додано`);
+      await ctx.reply(`Фото ${images.id} додано до продукту ${product.id}`);
 
       i++;
     }

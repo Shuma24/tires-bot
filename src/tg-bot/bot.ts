@@ -17,6 +17,9 @@ export class myBot implements IBot {
   constructor(
     private readonly _configService: IConfigService,
     private readonly _addProductConversation: BaseConversation,
+    private readonly _orderProductConversation: BaseConversation,
+    private readonly _setProductsImageConversation: BaseConversation,
+    private readonly _deleteProductConversation: BaseConversation,
   ) {
     this.instance = new Bot(this._configService.get('BOT_SECRET'));
     this.instance.use(
@@ -29,7 +32,7 @@ export class myBot implements IBot {
           price: 0,
           description: '',
           height: 0,
-          images: [],
+          productOrOrder: 0,
           pages: 0,
         }),
         storage: enhanceStorage({
@@ -43,7 +46,12 @@ export class myBot implements IBot {
     this.instance.use(conversations());
     this.instance.api.setMyCommands(commandList);
 
-    this.ListOfConversations = [_addProductConversation];
+    this.ListOfConversations = [
+      _addProductConversation,
+      _orderProductConversation,
+      _setProductsImageConversation,
+      _deleteProductConversation,
+    ];
 
     this.ListOfConversations.forEach((el) => {
       this.instance.use(
@@ -55,4 +63,11 @@ export class myBot implements IBot {
   }
 }
 
-injected(myBot, TOKENS.configService, TOKENS.addProductConversation);
+injected(
+  myBot,
+  TOKENS.configService,
+  TOKENS.addProductConversation,
+  TOKENS.orderProductConversation,
+  TOKENS.SetProductsImageConversation,
+  TOKENS.DeleteProductConversation,
+);

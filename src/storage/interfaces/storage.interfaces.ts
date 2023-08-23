@@ -13,4 +13,5 @@ export interface IUploadResponse {
 
 export interface IStorage {
   handleFile(file: inputFiles): Promise<IUploadResponse | undefined>;
+  deleteFile(key: string): Promise<true | undefined>;
 }

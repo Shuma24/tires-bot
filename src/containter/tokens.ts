@@ -25,5 +25,9 @@ export const TOKENS = {
   storage: token<IStorage>('storage'),
   fetchService: token<IFetchService>('fetchService'),
   addProductConversation: token<BaseConversation>('addProductConversation'),
-  imageCommand: token<Command>('cancelCommand'),
+  orderProductConversation: token<BaseConversation>('orderProductConversation'),
+  imageCommand: token<Command>('imageCommand'),
+  SetProductsImageConversation: token<BaseConversation>('setProductImage'),
+  DeleteProductCommand: token<Command>('deleteProductCommand'),
+  DeleteProductConversation: token<BaseConversation>('deleteProductConversation'),
 };

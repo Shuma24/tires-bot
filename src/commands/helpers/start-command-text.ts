@@ -37,9 +37,9 @@ export const onlyOnePageTires = `
 export const contactsFromMainMenu = `
 <b>Наші номера телефонів:</b>
 <pre>
-<a href="tel:+380XXXXXXXXX">+380XXXXXXXXX 📞</a>;
-<a href="tel:+380XXXXXXXXX">+380XXXXXXXXX 📞</a>;
-<a href="tel:+380XXXXXXXXX">+380XXXXXXXXX 📞</a>.
+<a href="tel:+3800000000">+38000000 📞</a>;
+<a href="tel:+3800000000">+38000000 📞</a>;
+<a href="tel:+3800000000">+38000000X 📞</a>.
 </pre>
 `;
 
@@ -52,3 +52,5 @@ export const askAboutWidth = `<b>Оберіть ШИРИНУ</b>`;
 export const askAboutHeight = `<b>Оберіть потрібну ВИСОТУ ПРОФІЛЯ</b>`;
 
 export const workOnYouReq = `<i>Обробляю ваш запит...</i>`;
+
+export const pagesText = `<strong>Є ще варіанти</strong>`;

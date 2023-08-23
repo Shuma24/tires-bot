@@ -5,6 +5,16 @@ export interface IProductRepository {
   createImage(url: string, tiresId: number): Promise<ITiresImages>;
   getBySize(size: string, skip?: number): Promise<IGetProductsBySize>;
   getById(id: number): Promise<ITires | null>;
-  //update(data: ITires): Promise<any>;
-  // delete(data: ITires): Promise<any>;
+  delete(id: number): Promise<boolean>;
+  update(
+    data: {
+      name?: string;
+      description?: string;
+      price?: number;
+      size?: string;
+      quantity?: number;
+      type?: string;
+    },
+    productID: number,
+  ): Promise<ITires>;
 }

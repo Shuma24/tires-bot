@@ -120,14 +120,63 @@ export class ProductService implements IProductService {
     }
   }
 
-  async update(data: ITires): Promise<ITires | undefined> {
-    if (!data) return undefined;
+  async update(
+    data: {
+      name?: string;
+      description?: string;
+      price?: number;
+      size?: string;
+      quantity?: number;
+      type?: string;
+    },
+    productID: number,
+  ): Promise<ITires | undefined> {
+    try {
+      const isCorrectID = await this.getById(productID);
 
-    return data;
+      if (!isCorrectID) {
+        this._loggerService.error('Incorrect product ID');
+        throw new Error('Incorrect product ID');
+      }
+
+      const updatedProduct = await this._productRepository.update({ ...data }, productID);
+
+      return updatedProduct;
+    } catch (error) {
+      if (error instanceof Error) {
+        this._loggerService.error(error.message);
+        throw new Error(error.message);
+      }
+    }
   }
-  delete(id: number): boolean {
-    const test = Boolean(id);
-    return test;
+  async delete(id: number): Promise<boolean | undefined> {
+    try {
+      const product = await this.getById(id);
+
+      if (!product) {
+        this._loggerService.error('Incorrect id');
+        throw new Error('Incorrect id');
+      }
+
+      if (product.images) {
+        for (let i = 0; i < product.images.length; i++) {
+          const baseURL = 'https://furniture-shop24.s3.eu-central-1.amazonaws.com/';
+
+          const key = decodeURIComponent(product.images[i].url.replace(baseURL, ''));
+
+          await this._storageService.deleteFile(key);
+        }
+      }
+
+      const delResult = await this._productRepository.delete(id);
+
+      return delResult;
+    } catch (error) {
+      if (error instanceof Error) {
+        this._loggerService.error(error.message);
+        throw new Error(error.message);
+      }
+    }
   }
 
   async getBySize(size: string, page?: number): Promise<IGetProductsBySize | undefined> {

@@ -2,6 +2,7 @@ import {
   CompleteMultipartUploadCommandOutput,
   PutObjectCommandInput,
   S3Client,
+  DeleteObjectCommand,
 } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
 
@@ -73,6 +74,23 @@ export class S3Storage implements IStorage {
       } else {
         throw new Error('S3 Upload Error');
       }
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      }
+    }
+  }
+
+  async deleteFile(key: string) {
+    try {
+      const command = new DeleteObjectCommand({
+        Bucket: this._configService.get('AWS_PUBLIC_BUCKET_NAME'),
+        Key: key,
+      });
+
+      await this.s3Client.send(command);
+
+      return true;
     } catch (error) {
       if (error instanceof Error) {
         throw new Error(error.message);

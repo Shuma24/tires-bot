@@ -22,6 +22,7 @@ import {
   contactsFromMainMenu,
   noTiresLength,
   onlyOnePageTires,
+  pagesText,
   productDescriptionGenerate,
   workOnYouReq,
 } from '../helpers/start-command-text';
@@ -47,6 +48,7 @@ export class StartCommand extends Command {
     this.setHeightAndTriggerDB();
     this.productPaginationCallback();
     this.photoPaginationCallback();
+    this.OrderCallback();
   }
 
   private startCommand() {
@@ -272,6 +274,16 @@ export class StartCommand extends Command {
     });
   }
 
+  private async OrderCallback() {
+    this.bot.callbackQuery(/order_(\d+)/, async (ctx) => {
+      const productToOrder = parseInt(ctx.match[1], 10);
+
+      ctx.session.productOrOrder = productToOrder;
+
+      await ctx.conversation.enter('orderProducts');
+    });
+  }
+
   private async handleProducts(ctx: HearsContext<IBotContext> | CallbackQueryContext<IBotContext>) {
     if (!ctx.session.radius || !ctx.session.type || !ctx.session.width || !ctx.session.height) {
       return await ctx.reply('Ви пропустили щось обрати..');
@@ -281,7 +293,9 @@ export class StartCommand extends Command {
     const products = await this._productService.getBySize(size, ctx.session.pages);
 
     if (!products || !products.data.length) {
-      return await ctx.reply(noTiresLength);
+      return await ctx.reply(noTiresLength, {
+        parse_mode: 'HTML',
+      });
     }
 
     for (let product of products.data) {
@@ -304,10 +318,12 @@ export class StartCommand extends Command {
         let currentImageIndex = 0;
         let nextImageIndex = (currentImageIndex + 1) % product.images.length;
 
-        imageButtons.push({
-          text: `Наступне фото 👉🏻`,
-          callback_data: `img_${product.id}_${nextImageIndex}`,
-        });
+        if (product.images.length > 1) {
+          imageButtons.push({
+            text: `Наступне фото 👉🏻`,
+            callback_data: `img_${product.id}_${nextImageIndex}`,
+          });
+        }
 
         await ctx.replyWithPhoto(
           product.images[0].url ||
@@ -331,21 +347,20 @@ export class StartCommand extends Command {
     }
 
     const buttonRow: InlineKeyboardButton[][] = [];
-    if (ctx.session.pages > 0) {
-      buttonRow.push([{ text: 'Назад', callback_data: `page_${ctx.session.pages - 1}` }]);
-    }
 
     if (ctx.session.pages < products.lastPage) {
       buttonRow.push([{ text: 'Вперед', callback_data: `page_${ctx.session.pages + 1}` }]);
     }
 
-    if (products.total <= 3) {
+    if (products.total <= 3 || ctx.session.pages === products.lastPage) {
+      ctx.session.pages = 0;
       return await ctx.reply(onlyOnePageTires, {
         parse_mode: 'HTML',
       });
     }
 
-    await ctx.reply('Це не все, переглянь наступну сторінку', {
+    await ctx.reply(pagesText, {
+      parse_mode: 'HTML',
       reply_markup: {
         inline_keyboard: buttonRow,
       },

@@ -22,7 +22,7 @@ model Tires {
 
 model Images {
   id        Int       @id @default(autoincrement())
-  Tires     Tires?    @relation(fields: [tiresId], references: [id])
+  Tires     Tires?    @relation(fields: [tiresId], references: [id], onDelete: Cascade)
   tiresId   Int?
   url       String
   createdAt DateTime? @default(now())
