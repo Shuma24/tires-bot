@@ -117,6 +117,47 @@ export class ProductRepository implements IProductRepository {
 
     return updatedProduct;
   }
+
+  async getByFields(
+    data: {
+      name?: string | undefined;
+      description?: string | undefined;
+      price?: number | undefined;
+      size?: string | undefined;
+      quantity?: number | undefined;
+      type?: string | undefined;
+    },
+    skip?: number,
+  ): Promise<IGetProductsBySize | null> {
+    const pageSize = 3;
+    const skipPage = skip || 0;
+
+    const products = await this._orm.client.tires.findMany({
+      where: { ...data },
+      include: {
+        images: true,
+      },
+      skip: skip,
+      take: pageSize,
+    });
+
+    const total = await this._orm.client.tires.count({
+      where: {
+        ...data,
+      },
+    });
+
+    const totalPages = Math.ceil(total / pageSize);
+
+    const currentPage = skipPage > totalPages ? totalPages : skipPage;
+
+    return {
+      data: products,
+      page: currentPage,
+      total: total,
+      lastPage: totalPages - 1,
+    };
+  }
 }
 
 injected(ProductRepository, TOKENS.ormService);

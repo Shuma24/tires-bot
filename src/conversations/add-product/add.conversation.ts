@@ -7,6 +7,21 @@ import { TOKENS } from '../../containter/tokens';
 import { ILoggerService } from '../../common/interfaces/logger.service.interface';
 import { IProductService } from '../../product/interfaces/product-service.interface';
 import { productReplyGenerator } from './helpers/product-reply-generator';
+import {
+  imageCount,
+  isPhotoProduct,
+  productDescription,
+  productHeight,
+  productName,
+  productPrice,
+  productQuantity,
+  productRadius,
+  productType,
+  productWidth,
+  waitForCreate,
+} from './helpers/text';
+import { heightKeyBoard, photoCountToUploadKeyboard, quantityKeyBoard, radiusKeyBoard, typeKeyBoard } from '../global/keyboard';
+import { isAddPhotoKeyboard } from './helpers/keyboard';
 
 export class AddProductConversation extends BaseConversation {
   constructor(
@@ -21,7 +36,7 @@ export class AddProductConversation extends BaseConversation {
   }
 
   async handle(conversation: IBotConversation, ctx: IBotContext): Promise<void> {
-    await ctx.reply('Погнали, введи назву коліс');
+    await ctx.reply(productName);
 
     const name = await conversation.waitFor('message');
 
@@ -30,7 +45,7 @@ export class AddProductConversation extends BaseConversation {
       return;
     }
 
-    await ctx.reply('Тепер напиши опис до коліс');
+    await ctx.reply(productDescription);
 
     const description = await conversation.waitFor('message');
 
@@ -39,7 +54,7 @@ export class AddProductConversation extends BaseConversation {
       return;
     }
 
-    await ctx.reply('Харош, введи ціну');
+    await ctx.reply(productPrice);
 
     const price = await conversation.waitFor('message');
 
@@ -48,9 +63,9 @@ export class AddProductConversation extends BaseConversation {
       return;
     }
 
-    await ctx.reply('Обери будь ласка тип', {
+    await ctx.reply(productType, {
       reply_markup: {
-        keyboard: [[{ text: 'summer' }], [{ text: 'winter' }], [{ text: 'allseason' }]],
+        keyboard: typeKeyBoard,
         resize_keyboard: true,
         one_time_keyboard: true,
       },
@@ -58,20 +73,14 @@ export class AddProductConversation extends BaseConversation {
 
     const type = await conversation.waitFor('message');
 
-    if (!type.message.text) {
-      await ctx.reply('Ай, вводиш не це.');
+    if (!type.message.text || type.message.text === 'exit') {
+      await ctx.reply('Помилка або exit');
       return;
     }
 
-    await ctx.reply(`Супер, певно вже надоїло но ще трішки, тепер обери радіус`, {
+    await ctx.reply(productRadius, {
       reply_markup: {
-        keyboard: [
-          [{ text: '13' }, { text: '14' }],
-          [{ text: '15' }, { text: '16' }],
-          [{ text: '17' }, { text: '18' }],
-          [{ text: '19' }, { text: '20' }],
-          [{ text: '21' }, { text: '22' }],
-        ],
+        keyboard: radiusKeyBoard,
         resize_keyboard: true,
         one_time_keyboard: true,
       },
@@ -88,9 +97,9 @@ export class AddProductConversation extends BaseConversation {
       return;
     }
 
-    await ctx.reply('Окей, обери ширину', {
+    await ctx.reply(productWidth, {
       reply_markup: {
-        keyboard: generateWidthTires(Number(radius.message.text), true),
+        keyboard: generateWidthTires(Number(radius.message.text)),
         resize_keyboard: true,
         one_time_keyboard: true,
       },
@@ -103,15 +112,9 @@ export class AddProductConversation extends BaseConversation {
       return;
     }
 
-    await ctx.reply(`Введи, висоту`, {
+    await ctx.reply(productHeight, {
       reply_markup: {
-        keyboard: [
-          [{ text: '12.5' }, { text: '25' }, { text: '30' }],
-          [{ text: '35' }, { text: '40' }, { text: '45' }],
-          [{ text: '50' }, { text: '55' }, { text: '60' }],
-          [{ text: '65' }, { text: '70' }, { text: '75' }],
-          [{ text: '80' }],
-        ],
+        keyboard: heightKeyBoard,
         resize_keyboard: true,
         one_time_keyboard: true,
       },
@@ -128,12 +131,9 @@ export class AddProductConversation extends BaseConversation {
       return;
     }
 
-    await ctx.reply(`Коліс в наявності?`, {
+    await ctx.reply(productQuantity, {
       reply_markup: {
-        keyboard: [
-          [{ text: '1' }, { text: '2' }],
-          [{ text: '3' }, { text: '4' }],
-        ],
+        keyboard: quantityKeyBoard,
         resize_keyboard: true,
         one_time_keyboard: true,
       },
@@ -150,7 +150,9 @@ export class AddProductConversation extends BaseConversation {
       return;
     }
 
-    await ctx.reply('Так я буду створювати продукт, зачекай');
+    await ctx.reply(waitForCreate, {
+      parse_mode: 'HTML',
+    });
 
     const product = await conversation.external(() => {
       return this._productService.create({
@@ -172,9 +174,9 @@ export class AddProductConversation extends BaseConversation {
 
     await ctx.reply(productReplyGenerator(product), { parse_mode: 'HTML' });
 
-    await ctx.reply('Будеш добавляти фото', {
+    await ctx.reply(isPhotoProduct, {
       reply_markup: {
-        keyboard: [[{ text: 'Так' }], [{ text: 'Ні' }]],
+        keyboard: isAddPhotoKeyboard,
         resize_keyboard: true,
         one_time_keyboard: true,
       },
@@ -191,9 +193,9 @@ export class AddProductConversation extends BaseConversation {
       return;
     }
 
-    await ctx.reply('Вибери скільки фото будеш добавляти', {
+    await ctx.reply(imageCount, {
       reply_markup: {
-        keyboard: [[{ text: '1' }, { text: '2' }], [{ text: '3' }, { text: '4' }], [{ text: '5' }]],
+        keyboard: photoCountToUploadKeyboard,
         resize_keyboard: true,
         one_time_keyboard: true,
       },

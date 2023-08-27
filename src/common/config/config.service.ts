@@ -10,6 +10,7 @@ export class ConfigService implements IConfigService {
 
   constructor(private readonly _loggerService: ILoggerService) {
     const { error, parsed } = config();
+
     if (error) throw new Error('.env is required.');
 
     if (!parsed) throw new Error('.env is empty');

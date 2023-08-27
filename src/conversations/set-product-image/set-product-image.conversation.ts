@@ -4,6 +4,9 @@ import { IBotContext, IBotConversation } from '../../tg-bot/interface/bot-contex
 import { BaseConversation } from '../conversation';
 import { TOKENS } from '../../containter/tokens';
 import { ILoggerService } from '../../common/interfaces/logger.service.interface';
+import { putID } from '../global/text';
+import { photoCountToUploadKeyboard } from '../global/keyboard';
+import { selectCountPhoto } from './helpers/text';
 
 export class SetProductsImageConversation extends BaseConversation {
   constructor(
@@ -18,7 +21,7 @@ export class SetProductsImageConversation extends BaseConversation {
   }
 
   async handle(conversation: IBotConversation, ctx: IBotContext): Promise<void> {
-    await ctx.reply('Введи продукт ID');
+    await ctx.reply(putID);
 
     const productID = await conversation.waitFor('message');
 
@@ -31,9 +34,9 @@ export class SetProductsImageConversation extends BaseConversation {
       return;
     }
 
-    await ctx.reply('Вибери скільки фото будеш добавляти', {
+    await ctx.reply(selectCountPhoto, {
       reply_markup: {
-        keyboard: [[{ text: '1' }, { text: '2' }], [{ text: '3' }, { text: '4' }], [{ text: '5' }]],
+        keyboard: photoCountToUploadKeyboard,
         resize_keyboard: true,
         one_time_keyboard: true,
       },

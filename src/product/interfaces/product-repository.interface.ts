@@ -17,4 +17,15 @@ export interface IProductRepository {
     },
     productID: number,
   ): Promise<ITires>;
+  getByFields(
+    data: {
+      name?: string | undefined;
+      description?: string | undefined;
+      price?: number | undefined;
+      size?: string | undefined;
+      quantity?: number | undefined;
+      type?: string | undefined;
+    },
+    skip?: number,
+  ): Promise<IGetProductsBySize | null>;
 }

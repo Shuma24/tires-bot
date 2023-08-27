@@ -12,7 +12,6 @@ export class ImageCommand extends Command {
     protected readonly _bot: IBot,
     private readonly _configService: IConfigService,
     private readonly _loggerService: ILoggerService,
-    private readonly _productService: IProductService,
   ) {
     super(_bot.instance, _loggerService);
   }
@@ -34,10 +33,4 @@ export class ImageCommand extends Command {
   }
 }
 
-injected(
-  ImageCommand,
-  TOKENS.bot,
-  TOKENS.configService,
-  TOKENS.loggerService,
-  TOKENS.productService,
-);
+injected(ImageCommand, TOKENS.bot, TOKENS.configService, TOKENS.loggerService);

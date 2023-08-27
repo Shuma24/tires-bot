@@ -23,4 +23,15 @@ export interface IProductService {
     productID: number,
   ): Promise<ITires | undefined>;
   delete(id: number): Promise<boolean | undefined>;
+  getByFields(
+    data: {
+      name?: string | undefined;
+      description?: string | undefined;
+      price?: number | undefined;
+      size?: string | undefined;
+      quantity?: number | undefined;
+      type?: string | undefined;
+    },
+    page?: number,
+  ): Promise<IGetProductsBySize | undefined>;
 }

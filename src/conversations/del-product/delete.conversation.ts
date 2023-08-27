@@ -4,6 +4,8 @@ import { IProductService } from '../../product/interfaces/product-service.interf
 import { IBotContext, IBotConversation } from '../../tg-bot/interface/bot-context.interface';
 import { BaseConversation } from '../conversation';
 import { TOKENS } from '../../containter/tokens';
+import { putID } from '../global/text';
+import { deleted } from './helpers/text';
 
 export class DeleteProductConversation extends BaseConversation {
   constructor(
@@ -18,7 +20,7 @@ export class DeleteProductConversation extends BaseConversation {
   }
 
   async handle(conversation: IBotConversation, ctx: IBotContext): Promise<void> {
-    await ctx.reply('Відправ ID продукту для видалення');
+    await ctx.reply(putID);
 
     const productID = await conversation.waitFor(':text');
 
@@ -39,7 +41,7 @@ export class DeleteProductConversation extends BaseConversation {
       return;
     }
 
-    await ctx.reply('Видалено');
+    await ctx.reply(deleted);
 
     return;
   }

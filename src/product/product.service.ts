@@ -11,10 +11,11 @@ import { TOKENS } from '../containter/tokens';
 import { ProductEntity } from './entity/product.entity';
 import { IProductRepository } from './interfaces/product-repository.interface';
 import { IConfigService } from '../common/interfaces/config.service.interface';
-import { IFetchService } from '../fetch/interfaces/fetch.interface';
+
 import { IResTGPath } from './interfaces/response.interface';
 import { IStorage } from '../storage/interfaces/storage.interfaces';
 import { ILoggerService } from '../common/interfaces/logger.service.interface';
+import { IFetchService } from '../common/fetch/interfaces/fetch.interface';
 
 export class ProductService implements IProductService {
   constructor(
@@ -201,17 +202,45 @@ export class ProductService implements IProductService {
     try {
       if (!id) {
         this._loggerService.error('No id');
-        throw new Error('No id');
+        return;
       }
 
       const product = await this._productRepository.getById(id);
 
       if (!product) {
         this._loggerService.error('Bad ID or another problem');
-        throw new Error('Bad ID or another problem');
+        return;
       }
 
       return product;
+    } catch (error) {
+      if (error instanceof Error) {
+        this._loggerService.error(error.message);
+        throw new Error(error.message);
+      }
+    }
+  }
+
+  async getByFields(
+    data: {
+      name?: string | undefined;
+      description?: string | undefined;
+      price?: number | undefined;
+      size?: string | undefined;
+      quantity?: number | undefined;
+      type?: string | undefined;
+    },
+    page: number,
+  ) {
+    try {
+      const findProduct = await this._productRepository.getByFields({ ...data }, page);
+
+      if (!findProduct) {
+        this._loggerService.error('No product or problem');
+        throw new Error('No product or problem');
+      }
+
+      return findProduct;
     } catch (error) {
       if (error instanceof Error) {
         this._loggerService.error(error.message);

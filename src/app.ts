@@ -17,8 +17,17 @@ export class Application {
     private readonly _addProductCommand: Command,
     private readonly _imageCommand: Command,
     private readonly _deleteCommand: Command,
+    private readonly _updateCommand: Command,
+    private readonly _getCommand: Command,
   ) {
-    this.commands = [_startCommand, _addProductCommand, _imageCommand, _deleteCommand];
+    this.commands = [
+      _startCommand,
+      _addProductCommand,
+      _imageCommand,
+      _deleteCommand,
+      _updateCommand,
+      _getCommand,
+    ];
   }
 
   initCommands() {
@@ -57,4 +66,6 @@ injected(
   TOKENS.addProductCommand,
   TOKENS.imageCommand,
   TOKENS.DeleteProductCommand,
+  TOKENS.UpdateProductCommand,
+  TOKENS.getProductCommand,
 );

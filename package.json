@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "start": "node ./dist/main.js",
-    "dev": "npx prisma generate & nodemon --legacy-watch --exitcrash  ./src/main.ts",
+    "dev": "npx prisma generate && nodemon --legacy-watch --exitcrash  ./src/main.ts",
     "generate": "npx prisma generate",
     "dev:migrate": "npx prisma migrate dev",
     "reset:migrate": "npx prisma migrate reset"

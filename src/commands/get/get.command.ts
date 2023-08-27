@@ -6,7 +6,7 @@ import { Command } from '../command';
 import { adminCheck } from '../helpers/admin-check';
 import { TOKENS } from '../../containter/tokens';
 
-export class UpdateProduct extends Command {
+export class GetProduct extends Command {
   constructor(
     protected readonly _bot: IBot,
     private readonly _loggerService: ILoggerService,
@@ -16,7 +16,7 @@ export class UpdateProduct extends Command {
   }
 
   handle(): void {
-    this.bot.command('upd', async (ctx) => {
+    this.bot.command('get', async (ctx) => {
       const adminsID = this._configService.get('ADMIN_ID');
 
       if (!ctx.msg.from) {
@@ -27,9 +27,9 @@ export class UpdateProduct extends Command {
 
       if (!isAdmin) return await ctx.reply('No access');
 
-      await ctx.conversation.enter('updateProduct');
+      await ctx.conversation.enter('getProduct');
     });
   }
 }
 
-injected(UpdateProduct, TOKENS.bot, TOKENS.loggerService, TOKENS.configService);
+injected(GetProduct, TOKENS.bot, TOKENS.loggerService, TOKENS.configService);

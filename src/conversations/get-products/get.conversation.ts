@@ -2,26 +2,26 @@ import { injected } from 'brandi';
 import { ILoggerService } from '../../common/interfaces/logger.service.interface';
 import { generateWidthTires } from '../../helpers/width-button.generator';
 import { IProductService } from '../../product/interfaces/product-service.interface';
-import { IBotContext, IBotConversation } from '../../tg-bot/interface/bot-context.interface';
+import { IBotConversation, IBotContext } from '../../tg-bot/interface/bot-context.interface';
 import { BaseConversation } from '../conversation';
 import { updateProductReplyGenerator } from './helpers/func';
-import { selectFieldToUpdateKeyboard } from './helpers/keyboard';
+import { selectFieldToSearchKeyboard } from './helpers/keyboard';
 import {
-  awaitUserID,
-  fieldToUpdate,
-  setNewDescription,
-  setNewHeight,
-  setNewName,
-  setNewPrice,
-  setNewQuantity,
-  setNewRadius,
-  setNewType,
-  setNewWidth,
+  findBy,
+  findByDescription,
+  findByHeight,
+  findByID,
+  findByName,
+  findByPrice,
+  findByQuantity,
+  findByRadius,
+  findByType,
+  findByWidth,
 } from './helpers/text';
 import { TOKENS } from '../../containter/tokens';
 import { heightKeyBoard, quantityKeyBoard, radiusKeyBoard, typeKeyBoard } from '../global/keyboard';
 
-export class UpdateProductConversation extends BaseConversation {
+export class GetProductConversation extends BaseConversation {
   constructor(
     private readonly _loggerService: ILoggerService,
     private readonly _productService: IProductService,
@@ -30,39 +30,22 @@ export class UpdateProductConversation extends BaseConversation {
   }
 
   public getName(): string {
-    return 'updateProduct';
+    return 'getProduct';
   }
 
   async handle(conversation: IBotConversation, ctx: IBotContext): Promise<void> {
-    await ctx.reply(awaitUserID);
-
-    const productID = await conversation.waitFor(':text');
-
-    if (
-      !productID.message?.text ||
-      isNaN(Number(productID.message.text)) ||
-      productID.message?.text === 'exit'
-    ) {
-      await ctx.reply('Введено не число або exit');
-
-      return;
-    }
-
-    await ctx.reply(fieldToUpdate, {
+    await ctx.reply(findBy, {
       reply_markup: {
-        keyboard: selectFieldToUpdateKeyboard,
-        one_time_keyboard: true,
-        remove_keyboard: true,
+        keyboard: selectFieldToSearchKeyboard,
         resize_keyboard: true,
+        one_time_keyboard: true,
       },
     });
 
-    const selectedFieldToUpdate = await conversation.waitFor('message');
+    const action = await conversation.waitFor('message');
 
-    if (!selectedFieldToUpdate.message?.text || selectedFieldToUpdate.message.text === 'exit') {
+    if (!action.message.text || action.message.text === 'exit') {
       await ctx.reply('Помилка або exit');
-
-      return;
     }
 
     const data: {
@@ -74,9 +57,33 @@ export class UpdateProductConversation extends BaseConversation {
       type?: string;
     } = {};
 
-    switch (selectedFieldToUpdate.message.text) {
+    switch (action.message.text) {
+      case 'id':
+        await ctx.reply(findByID);
+
+        const id = await conversation.waitFor('message');
+
+        if (!id.message.text || id.message.text === 'exit' || isNaN(Number(id.message.text))) {
+          await ctx.reply('Помилка ID або exit');
+        }
+
+        const product = await conversation.external(() => {
+          return this._productService.getById(Number(id.message.text));
+        });
+
+        if (!product) {
+          await ctx.reply('Нема такого продукту');
+          return;
+        }
+
+        await ctx.reply(updateProductReplyGenerator({ ...product }), {
+          parse_mode: 'HTML',
+        });
+
+        return;
+
       case 'name':
-        await ctx.reply(setNewName);
+        await ctx.reply(findByName);
         const name = await conversation.waitFor('message');
 
         if (!name.message.text || name.message.text === 'exit') {
@@ -89,7 +96,7 @@ export class UpdateProductConversation extends BaseConversation {
         break;
 
       case 'description':
-        await ctx.reply(setNewDescription);
+        await ctx.reply(findByDescription);
 
         const description = await conversation.waitFor('message');
 
@@ -103,7 +110,7 @@ export class UpdateProductConversation extends BaseConversation {
         break;
 
       case 'price':
-        await ctx.reply(setNewPrice);
+        await ctx.reply(findByPrice);
 
         const price = await conversation.waitFor('message');
 
@@ -121,7 +128,7 @@ export class UpdateProductConversation extends BaseConversation {
         break;
 
       case 'size':
-        await ctx.reply(setNewRadius, {
+        await ctx.reply(findByRadius, {
           reply_markup: {
             keyboard: radiusKeyBoard,
             resize_keyboard: true,
@@ -140,9 +147,9 @@ export class UpdateProductConversation extends BaseConversation {
           return;
         }
 
-        await ctx.reply(setNewWidth, {
+        await ctx.reply(findByWidth, {
           reply_markup: {
-            keyboard: generateWidthTires(Number(radius.message.text), true),
+            keyboard: generateWidthTires(Number(radius.message.text)),
             resize_keyboard: true,
             one_time_keyboard: true,
           },
@@ -159,7 +166,7 @@ export class UpdateProductConversation extends BaseConversation {
           return;
         }
 
-        await ctx.reply(setNewHeight, {
+        await ctx.reply(findByHeight, {
           reply_markup: {
             keyboard: heightKeyBoard,
             resize_keyboard: true,
@@ -183,7 +190,7 @@ export class UpdateProductConversation extends BaseConversation {
         break;
 
       case 'quantity':
-        await ctx.reply(setNewQuantity, {
+        await ctx.reply(findByQuantity, {
           reply_markup: {
             keyboard: quantityKeyBoard,
             resize_keyboard: true,
@@ -207,7 +214,7 @@ export class UpdateProductConversation extends BaseConversation {
         break;
 
       case 'type':
-        await ctx.reply(setNewType, {
+        await ctx.reply(findByType, {
           reply_markup: {
             keyboard: typeKeyBoard,
             resize_keyboard: true,
@@ -227,25 +234,25 @@ export class UpdateProductConversation extends BaseConversation {
         break;
 
       default:
-        await ctx.reply('Сталась помилка або exit, не коректне поле для апдейту');
+        await ctx.reply('Сталась помилка або exit, не коректне поле для пошуку');
         return;
     }
 
-    const product = await conversation.external(() => {
-      return this._productService.update(data, Number(productID.message.text));
+    const products = await conversation.external(() => {
+      return this._productService.getByFields({ ...data });
     });
 
-    if (!product) {
-      await ctx.reply('Пробелма з апдейтом');
+    if (!products?.data.length) {
+      await ctx.reply('Продуктів не знайдено');
       return;
     }
 
-    await ctx.reply(updateProductReplyGenerator(product), {
-      parse_mode: 'HTML',
-    });
+    for (let i = 0; i < products.data.length; i++) {
+      await ctx.reply(updateProductReplyGenerator({ ...products.data[i] }), { parse_mode: 'HTML' });
+    }
 
     return;
   }
 }
 
-injected(UpdateProductConversation, TOKENS.loggerService, TOKENS.productService);
+injected(GetProductConversation, TOKENS.loggerService, TOKENS.productService);

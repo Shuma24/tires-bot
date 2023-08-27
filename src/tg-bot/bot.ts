@@ -20,6 +20,8 @@ export class myBot implements IBot {
     private readonly _orderProductConversation: BaseConversation,
     private readonly _setProductsImageConversation: BaseConversation,
     private readonly _deleteProductConversation: BaseConversation,
+    private readonly _updateProductConversation: BaseConversation,
+    private readonly _getProductConversation: BaseConversation,
   ) {
     this.instance = new Bot(this._configService.get('BOT_SECRET'));
     this.instance.use(
@@ -51,6 +53,8 @@ export class myBot implements IBot {
       _orderProductConversation,
       _setProductsImageConversation,
       _deleteProductConversation,
+      _updateProductConversation,
+      _getProductConversation,
     ];
 
     this.ListOfConversations.forEach((el) => {
@@ -70,4 +74,6 @@ injected(
   TOKENS.orderProductConversation,
   TOKENS.SetProductsImageConversation,
   TOKENS.DeleteProductConversation,
+  TOKENS.UpdateProductConversation,
+  TOKENS.getProductConversation,
 );

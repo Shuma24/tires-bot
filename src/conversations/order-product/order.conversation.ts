@@ -2,14 +2,17 @@ import { injected } from 'brandi';
 import { ILoggerService } from '../../common/interfaces/logger.service.interface';
 import { IBotContext, IBotConversation } from '../../tg-bot/interface/bot-context.interface';
 import { BaseConversation } from '../conversation';
-import { createOrderResponse, orderAlert, startOrder, userPhone } from '../helpers/text-reply';
+import { createOrderResponse, orderAlert, startOrder, userPhone } from './helpers/text-reply';
 import { TOKENS } from '../../containter/tokens';
 import { IProductService } from '../../product/interfaces/product-service.interface';
+import { IConfigService } from '../../common/interfaces/config.service.interface';
+import { cancelOrder } from './helpers/keyboard';
 
 export class OrderProductsConversation extends BaseConversation {
   constructor(
     private readonly _loggerService: ILoggerService,
     private readonly _productService: IProductService,
+    private readonly _configService: IConfigService,
   ) {
     super(_loggerService);
   }
@@ -21,9 +24,10 @@ export class OrderProductsConversation extends BaseConversation {
     await ctx.reply(startOrder, {
       parse_mode: 'HTML',
       reply_markup: {
-        keyboard: [[{ text: 'Скасувати замовлення' }]],
+        keyboard: cancelOrder,
         resize_keyboard: true,
         one_time_keyboard: true,
+        remove_keyboard: true,
       },
     });
 
@@ -42,9 +46,10 @@ export class OrderProductsConversation extends BaseConversation {
     await ctx.reply(userPhone, {
       parse_mode: 'HTML',
       reply_markup: {
-        keyboard: [[{ text: 'Скасувати замовлення' }]],
+        keyboard: cancelOrder,
         resize_keyboard: true,
         one_time_keyboard: true,
+        remove_keyboard: true,
       },
     });
 
@@ -83,24 +88,36 @@ export class OrderProductsConversation extends BaseConversation {
       },
     );
 
-    await ctx.api.sendMessage(
-      '582444807',
-      orderAlert(
-        name.message?.text,
-        phone.message?.text,
-        product.name,
-        product.size,
-        product.type,
-        product.quantity,
-        product.id,
-      ),
-      {
-        parse_mode: 'HTML',
-      },
-    );
+    const admins = this._configService
+      .get('ADMIN_ID')
+      .split(',')
+      .map((el) => el.trim());
+
+    for (let i = 0; i < admins.length; i++) {
+      await ctx.api.sendMessage(
+        admins[i],
+        orderAlert(
+          name.message?.text,
+          phone.message?.text,
+          product.name,
+          product.size,
+          product.type,
+          product.quantity,
+          product.id,
+        ),
+        {
+          parse_mode: 'HTML',
+        },
+      );
+    }
 
     return;
   }
 }
 
-injected(OrderProductsConversation, TOKENS.loggerService, TOKENS.productService);
+injected(
+  OrderProductsConversation,
+  TOKENS.loggerService,
+  TOKENS.productService,
+  TOKENS.configService,
+);
