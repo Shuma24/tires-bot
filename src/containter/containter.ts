@@ -38,8 +38,8 @@ container.bind(TOKENS.productService).toInstance(ProductService).inSingletonScop
 container.bind(TOKENS.addProductCommand).toInstance(AddProduct).inTransientScope();
 container.bind(TOKENS.storage).toInstance(S3Storage).inSingletonScope();
 container.bind(TOKENS.fetchService).toInstance(FetchService).inSingletonScope();
-container.bind(TOKENS.addProductConversation).toInstance(AddProductConversation).inSingletonScope();
-container.bind(TOKENS.imageCommand).toInstance(ImageCommand).inSingletonScope();
+container.bind(TOKENS.addProductConversation).toInstance(AddProductConversation).inTransientScope();
+container.bind(TOKENS.imageCommand).toInstance(ImageCommand).inTransientScope();
 container
   .bind(TOKENS.orderProductConversation)
   .toInstance(OrderProductsConversation)
@@ -54,11 +54,11 @@ container
   .toInstance(DeleteProductConversation)
   .inTransientScope();
 
-container.bind(TOKENS.UpdateProductCommand).toInstance(UpdateProduct).inSingletonScope();
+container.bind(TOKENS.UpdateProductCommand).toInstance(UpdateProduct).inTransientScope();
 container
   .bind(TOKENS.UpdateProductConversation)
   .toInstance(UpdateProductConversation)
-  .inSingletonScope();
+  .inTransientScope();
 
-container.bind(TOKENS.getProductCommand).toInstance(GetProduct).inSingletonScope();
-container.bind(TOKENS.getProductConversation).toInstance(GetProductConversation).inSingletonScope();
+container.bind(TOKENS.getProductCommand).toInstance(GetProduct).inTransientScope();
+container.bind(TOKENS.getProductConversation).toInstance(GetProductConversation).inTransientScope();
