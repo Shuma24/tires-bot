@@ -24,6 +24,10 @@ import { UpdateProductConversation } from '../conversations/upd-product/update.c
 import { GetProduct } from '../commands/get/get.command';
 import { GetProductConversation } from '../conversations/get-products/get.conversation';
 import { FetchService } from '../common/fetch/fetch.service';
+import { BanUsers } from '../commands/ban/ban.command';
+import { BanConversation } from '../conversations/ban-user/ban.conversation';
+import { UnbanUsers } from '../commands/unban/unban.command';
+import { UnBanConversation } from '../conversations/unban-users/unban.conversation';
 
 export const container = new Container();
 
@@ -62,3 +66,8 @@ container
 
 container.bind(TOKENS.getProductCommand).toInstance(GetProduct).inTransientScope();
 container.bind(TOKENS.getProductConversation).toInstance(GetProductConversation).inTransientScope();
+
+container.bind(TOKENS.banCommand).toInstance(BanUsers).inTransientScope();
+container.bind(TOKENS.banConversation).toInstance(BanConversation).inTransientScope();
+container.bind(TOKENS.unbanCommand).toInstance(UnbanUsers).inTransientScope();
+container.bind(TOKENS.unbanConversation).toInstance(UnBanConversation).inTransientScope();

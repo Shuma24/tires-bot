@@ -34,4 +34,8 @@ export const TOKENS = {
   UpdateProductConversation: token<BaseConversation>('updateProductConversation'),
   getProductCommand: token<Command>('getProductCommand'),
   getProductConversation: token<BaseConversation>('getProductConversation'),
+  banCommand: token<Command>('banCommand'),
+  banConversation: token<BaseConversation>('banConversation'),
+  unbanCommand: token<Command>('unBanCommand'),
+  unbanConversation: token<BaseConversation>('unBanConversation'),
 };

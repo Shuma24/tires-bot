@@ -29,6 +29,8 @@ export class UpdateProduct extends Command {
 
       await ctx.conversation.enter('updateProduct');
     });
+
+    return;
   }
 }
 

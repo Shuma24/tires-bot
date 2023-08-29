@@ -29,6 +29,8 @@ export class ImageCommand extends Command {
       if (!isAdmin) return await ctx.reply('No access');
 
       await ctx.conversation.enter('setProductImage');
+
+      return;
     });
   }
 }

@@ -1,1 +1,1 @@
-export const isAddPhotoKeyboard = [[{ text: 'Так' }], [{ text: 'Ні' }]];
+export const isAddPhotoKeyboard = [[{ text: 'Yes' }], [{ text: 'No' }]];

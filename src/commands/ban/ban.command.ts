@@ -6,7 +6,7 @@ import { Command } from '../command';
 import { adminCheck } from '../helpers/admin-check';
 import { TOKENS } from '../../containter/tokens';
 
-export class DeleteProduct extends Command {
+export class BanUsers extends Command {
   constructor(
     protected readonly _bot: IBot,
     private readonly _loggerService: ILoggerService,
@@ -16,7 +16,7 @@ export class DeleteProduct extends Command {
   }
 
   handle(): void {
-    this.bot.command('del', async (ctx) => {
+    this.bot.command('ban', async (ctx) => {
       const adminsID = this._configService.get('ADMIN_ID');
 
       if (!ctx.msg.from) {
@@ -27,11 +27,11 @@ export class DeleteProduct extends Command {
 
       if (!isAdmin) return await ctx.reply('No access');
 
-      await ctx.conversation.enter('delProduct');
+      await ctx.conversation.enter('banUsers');
 
       return;
     });
   }
 }
 
-injected(DeleteProduct, TOKENS.bot, TOKENS.loggerService, TOKENS.configService);
+injected(BanUsers, TOKENS.bot, TOKENS.loggerService, TOKENS.configService);

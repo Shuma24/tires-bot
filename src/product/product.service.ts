@@ -71,6 +71,10 @@ export class ProductService implements IProductService {
     try {
       const token = this._configService.get('BOT_SECRET');
 
+      const isTires = await this.getById(tiresID);
+
+      if (!isTires?.id || isTires.id !== tiresID) return;
+
       if (!token) {
         this._loggerService.error('Problems with get token from .env');
         throw new Error('Problems with get token from .env');
@@ -180,14 +184,18 @@ export class ProductService implements IProductService {
     }
   }
 
-  async getBySize(size: string, page?: number): Promise<IGetProductsBySize | undefined> {
+  async getForCustomer(
+    size: string,
+    type: string,
+    page?: number,
+  ): Promise<IGetProductsBySize | undefined> {
     try {
       if (!size) {
         this._loggerService.error('No size');
         throw new Error('Size is required.');
       }
 
-      const products = await this._productRepository.getBySize(size, page);
+      const products = await this._productRepository.getForCustomer(size, type, page);
 
       return products;
     } catch (error) {

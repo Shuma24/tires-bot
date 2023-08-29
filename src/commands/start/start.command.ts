@@ -57,7 +57,8 @@ export class StartCommand extends Command {
       await ctx.reply('Привіт ✌🏻');
       await ctx.reply('Я допоможу тобі із підбором шин до твого 🚗');
 
-      await ctx.reply('Виберіть опцію:', {
+      await ctx.reply(`<b>Виберіть опцію:</b>`, {
+        parse_mode: 'HTML',
         reply_markup: {
           keyboard: startButtons,
           resize_keyboard: true,
@@ -290,7 +291,11 @@ export class StartCommand extends Command {
     }
 
     const size = `${ctx.session.width}/${ctx.session.height}/${ctx.session.radius}`;
-    const products = await this._productService.getBySize(size, ctx.session.pages);
+    const products = await this._productService.getForCustomer(
+      size,
+      ctx.session.type,
+      ctx.session.pages,
+    );
 
     if (!products || !products.data.length) {
       return await ctx.reply(noTiresLength, {

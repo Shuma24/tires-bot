@@ -10,7 +10,7 @@ export const productDescriptionGenerate = (
 <i>${description}</i>
 \n
 <b>Кількість:</b> ${quantity} шт.
-<b>Ціна:</b> ${price} грн.
+<b>Ціна:</b> ${price} грн/шт.
     `;
 
   return captionText;
@@ -19,27 +19,24 @@ export const productDescriptionGenerate = (
 export const noTiresLength = `
 <b>Нажаль такого варіанту немає.</b>
 Однак ви можете замовити такий варіант або уточнити наявність:
-<a href="tel:+380XXXXXXXXX">+380XXXXXXXXX 📞</a>;
-<a href="tel:+380XXXXXXXXX">+380XXXXXXXXX 📞</a>;
-<a href="tel:+380XXXXXXXXX">+380XXXXXXXXX 📞</a>.
+<a href="tel:+380-93-789-58-77">+380-93-789-58-77 📞</a>;
+<a href="tel:+380-93-187-75-58">+380-93-187-75-58 📞</a>.
 `;
 
 export const onlyOnePageTires = `
 <b>Це всі товари</b>
 Однак ви можете замовити потрібні вам шини або уточнити наявність:
 <pre>
-<a href="tel:+380XXXXXXXXX">+380XXXXXXXXX 📞</a>;
-<a href="tel:+380XXXXXXXXX">+380XXXXXXXXX 📞</a>;
-<a href="tel:+380XXXXXXXXX">+380XXXXXXXXX 📞</a>.
+<a href="tel:+380-93-789-58-77">+380-93-789-58-77 📞</a>;
+<a href="tel:+380-93-187-75-58">+380-93-187-75-58 📞</a>.
 </pre>
 `;
 
 export const contactsFromMainMenu = `
 <b>Наші номера телефонів:</b>
 <pre>
-<a href="tel:+3800000000">+38000000 📞</a>;
-<a href="tel:+3800000000">+38000000 📞</a>;
-<a href="tel:+3800000000">+38000000X 📞</a>.
+<a href="tel:+380-93-789-58-77">+380-93-789-58-77 📞</a>;
+<a href="tel:+380-93-187-75-58">+380-93-187-75-58 📞</a>.
 </pre>
 `;
 

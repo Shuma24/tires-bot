@@ -1,6 +1,16 @@
 export const generateWidthTires = (radius: number, withHomeAndBack?: boolean) => {
   if (!withHomeAndBack) {
     switch (radius) {
+      case 13:
+        return [
+          [{ text: '110' }, { text: '120' }, { text: '125' }],
+          [{ text: '130' }, { text: '135' }, { text: '140' }],
+          [{ text: '145' }, { text: '150' }, { text: '155' }],
+          [{ text: '165' }, { text: '175' }, { text: '185' }],
+          [{ text: '195' }, { text: '205' }],
+          [{ text: '↩️ Назад' }, { text: '🏠 Home' }],
+        ];
+
       case 14:
         return [
           [{ text: '165' }, { text: '175' }, { text: '185' }],
@@ -83,6 +93,15 @@ export const generateWidthTires = (radius: number, withHomeAndBack?: boolean) =>
     }
   } else {
     switch (radius) {
+      case 13:
+        return [
+          [{ text: '110' }, { text: '120' }, { text: '125' }],
+          [{ text: '130' }, { text: '135' }, { text: '140' }],
+          [{ text: '145' }, { text: '150' }, { text: '155' }],
+          [{ text: '165' }, { text: '175' }, { text: '185' }],
+          [{ text: '195' }, { text: '205' }],
+        ];
+
       case 14:
         return [
           [{ text: '165' }, { text: '175' }, { text: '185' }],

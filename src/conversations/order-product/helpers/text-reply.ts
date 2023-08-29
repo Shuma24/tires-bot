@@ -1,6 +1,5 @@
 export const startOrder = `
-<b>Окей, вас зацікавив даний продукт,</b>
-<i>давайте почнемо замовлення.</i>
+<b>Для замовлення</b>
 Введіть своє ім'я:
 `;
 
@@ -26,7 +25,7 @@ export const createOrderResponse = (
 Вас звати <strong>${name}</strong>, номер телефону: <strong>${phone}</strong>
 Ви замовили <strong>${productName}/${size}</strong> сезон: <strong>${correctType}</strong>
 кількість: <strong>${quantity}</strong>
-Ми з вами зв'яжемось протягом 24 годин.
+Ми з вами зв'яжемось протягом години.
 `;
 
   return text;
@@ -40,6 +39,7 @@ export const orderAlert = (
   type: string,
   quantity: number,
   id: number,
+  telegramID: number,
 ) => {
   let correctType = '';
 
@@ -51,7 +51,8 @@ export const orderAlert = (
 <strong>${name}</strong>, номер телефону: <strong>${phone}</strong>
 ЗРОБИВ ЗАМОВЛЕННЯ!
 ЗАМОВИВ: <strong>${productName}/${size}</strong> сезон: <strong>${correctType}</strong>
-кількість: <strong>${quantity}</strong> номер в ДБ <strong>${id}</strong>
+кількість: <strong>${quantity}</strong> номер в ДБ: <strong>${id}</>
+<strong>USER TG ID: ${telegramID}</strong>
 `;
 
   return text;

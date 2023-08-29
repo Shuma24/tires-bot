@@ -38,7 +38,7 @@ export class ProductRepository implements IProductRepository {
     return images;
   }
 
-  async getBySize(size: string, skip?: number): Promise<IGetProductsBySize> {
+  async getForCustomer(size: string, type: string, skip?: number): Promise<IGetProductsBySize> {
     const pageSize = 3;
     const skipPage = skip || 0;
 
@@ -48,6 +48,7 @@ export class ProductRepository implements IProductRepository {
       },
       where: {
         size: size,
+        type: type,
       },
       take: pageSize,
       skip: pageSize * skipPage,
@@ -56,6 +57,7 @@ export class ProductRepository implements IProductRepository {
     const total = await this._orm.client.tires.count({
       where: {
         size: size,
+        type: type,
       },
     });
 

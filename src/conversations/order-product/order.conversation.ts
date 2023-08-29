@@ -104,6 +104,7 @@ export class OrderProductsConversation extends BaseConversation {
           product.type,
           product.quantity,
           product.id,
+          name.message.from.id,
         ),
         {
           parse_mode: 'HTML',

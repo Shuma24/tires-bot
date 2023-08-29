@@ -20,7 +20,13 @@ import {
   productWidth,
   waitForCreate,
 } from './helpers/text';
-import { heightKeyBoard, photoCountToUploadKeyboard, quantityKeyBoard, radiusKeyBoard, typeKeyBoard } from '../global/keyboard';
+import {
+  heightKeyBoard,
+  photoCountToUploadKeyboard,
+  quantityKeyBoard,
+  radiusKeyBoard,
+  typeKeyBoard,
+} from '../global/keyboard';
 import { isAddPhotoKeyboard } from './helpers/keyboard';
 
 export class AddProductConversation extends BaseConversation {
@@ -186,8 +192,8 @@ export class AddProductConversation extends BaseConversation {
 
     if (
       !isHavePhoto.message.text ||
-      isHavePhoto.message.text === 'Ні' ||
-      isHavePhoto.message.text !== 'Так'
+      isHavePhoto.message.text === 'No' ||
+      isHavePhoto.message.text !== 'Yes'
     ) {
       await ctx.reply('Ок можна добавити потім');
       return;
@@ -213,7 +219,7 @@ export class AddProductConversation extends BaseConversation {
       return;
     }
 
-    await ctx.reply(`Кидай ${count.message.text} фото`);
+    await ctx.reply(`Відправ ${count.message.text} фото`);
 
     let i = 0;
 

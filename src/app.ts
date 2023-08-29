@@ -19,6 +19,8 @@ export class Application {
     private readonly _deleteCommand: Command,
     private readonly _updateCommand: Command,
     private readonly _getCommand: Command,
+    private readonly _banCommand: Command,
+    private readonly _unbanCommand: Command,
   ) {
     this.commands = [
       _startCommand,
@@ -27,6 +29,8 @@ export class Application {
       _deleteCommand,
       _updateCommand,
       _getCommand,
+      _banCommand,
+      _unbanCommand,
     ];
   }
 
@@ -68,4 +72,6 @@ injected(
   TOKENS.DeleteProductCommand,
   TOKENS.UpdateProductCommand,
   TOKENS.getProductCommand,
+  TOKENS.banCommand,
+  TOKENS.unbanCommand,
 );
