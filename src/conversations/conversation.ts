@@ -1,6 +1,5 @@
-import { ILoggerService } from '../common/interfaces/logger.service.interface';
-
-import { IBotContext, IBotConversation } from '../tg-bot/interface/bot-context.interface';
+import { IBotContext, IBotConversation } from '../bot/interface/bot-context.interface';
+import { ILoggerService } from '../core/common/interfaces/logger.service.interface';
 
 export abstract class BaseConversation {
   constructor(_loggerService: ILoggerService) {

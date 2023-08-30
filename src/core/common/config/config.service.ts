@@ -2,14 +2,14 @@ import { DotenvParseOutput, config } from 'dotenv';
 
 import { IConfigService } from '../interfaces/config.service.interface';
 import { ILoggerService } from '../interfaces/logger.service.interface';
-import { injected } from 'brandi';
-import { TOKENS } from '../../containter/tokens';
 
 export class ConfigService implements IConfigService {
   config: DotenvParseOutput;
 
   constructor(private readonly _loggerService: ILoggerService) {
-    const { error, parsed } = config();
+    const env = process.env.NODE_ENV || 'development';
+
+    const { error, parsed } = config({ path: `.env.${env}` });
 
     if (error) throw new Error('.env is required.');
 
@@ -26,5 +26,3 @@ export class ConfigService implements IConfigService {
     return result;
   }
 }
-
-injected(ConfigService, TOKENS.loggerService);

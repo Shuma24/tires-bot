@@ -1,14 +1,13 @@
 import { Bot, enhanceStorage, session } from 'grammy';
 import { conversations, createConversation } from '@grammyjs/conversations';
 
-import { IConfigService } from '../common/interfaces/config.service.interface';
 import { IBot } from './interface/bot.interface';
-import { injected } from 'brandi';
-import { TOKENS } from '../containter/tokens';
 import { IBotContext } from './interface/bot-context.interface';
 import { FileAdapter } from '@grammyjs/storage-file';
 import { commandList } from './helpers/commands-list';
 import { BaseConversation } from '../conversations/conversation';
+import { IConfigService } from '../core/common/interfaces/config.service.interface';
+import { IConversationFactory } from '../conversations/interfaces/conversation-factory.interface';
 
 export class myBot implements IBot {
   instance: Bot<IBotContext>;
@@ -16,14 +15,7 @@ export class myBot implements IBot {
 
   constructor(
     private readonly _configService: IConfigService,
-    private readonly _addProductConversation: BaseConversation,
-    private readonly _orderProductConversation: BaseConversation,
-    private readonly _setProductsImageConversation: BaseConversation,
-    private readonly _deleteProductConversation: BaseConversation,
-    private readonly _updateProductConversation: BaseConversation,
-    private readonly _getProductConversation: BaseConversation,
-    private readonly _banConversation: BaseConversation,
-    private readonly _unbanConversation: BaseConversation,
+    private readonly _conversationFactory: IConversationFactory,
   ) {
     this.instance = new Bot(this._configService.get('BOT_SECRET'));
     this.instance.use(
@@ -50,16 +42,7 @@ export class myBot implements IBot {
     this.instance.use(conversations());
     this.instance.api.setMyCommands(commandList);
 
-    this.ListOfConversations = [
-      _addProductConversation,
-      _orderProductConversation,
-      _setProductsImageConversation,
-      _deleteProductConversation,
-      _updateProductConversation,
-      _getProductConversation,
-      _banConversation,
-      _unbanConversation,
-    ];
+    this.ListOfConversations = this._conversationFactory.createConversation();
 
     this.ListOfConversations.forEach((el) => {
       this.instance.use(
@@ -70,16 +53,3 @@ export class myBot implements IBot {
     });
   }
 }
-
-injected(
-  myBot,
-  TOKENS.configService,
-  TOKENS.addProductConversation,
-  TOKENS.orderProductConversation,
-  TOKENS.SetProductsImageConversation,
-  TOKENS.DeleteProductConversation,
-  TOKENS.UpdateProductConversation,
-  TOKENS.getProductConversation,
-  TOKENS.banConversation,
-  TOKENS.unbanConversation,
-);

@@ -1,12 +1,15 @@
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 
 import { IFetchService } from './interfaces/fetch.interface';
+import { ILoggerService } from '../interfaces/logger.service.interface';
 
 export class FetchService implements IFetchService {
   private readonly client: AxiosInstance;
 
-  constructor() {
+  constructor(private readonly _loggerService: ILoggerService) {
     this.client = axios.create();
+
+    _loggerService.info('Fetch service initialized');
   }
 
   getClient(): AxiosInstance {

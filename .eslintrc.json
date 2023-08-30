@@ -19,7 +19,7 @@
     ],
     "rules": {
         "@typescript-eslint/no-explicit-any": "off",
-        "no-console": "warn",
+        "no-console": "error",
         "@typescript-eslint/no-floating-promises": "error"
     }
 }

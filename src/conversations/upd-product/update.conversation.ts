@@ -1,8 +1,6 @@
-import { injected } from 'brandi';
-import { ILoggerService } from '../../common/interfaces/logger.service.interface';
 import { generateWidthTires } from '../../helpers/width-button.generator';
 import { IProductService } from '../../product/interfaces/product-service.interface';
-import { IBotContext, IBotConversation } from '../../tg-bot/interface/bot-context.interface';
+
 import { BaseConversation } from '../conversation';
 import { updateProductReplyGenerator } from './helpers/func';
 import { selectFieldToUpdateKeyboard } from './helpers/keyboard';
@@ -18,8 +16,10 @@ import {
   setNewType,
   setNewWidth,
 } from './helpers/text';
-import { TOKENS } from '../../containter/tokens';
+
 import { heightKeyBoard, quantityKeyBoard, radiusKeyBoard, typeKeyBoard } from '../global/keyboard';
+import { ILoggerService } from '../../core/common/interfaces/logger.service.interface';
+import { IBotContext, IBotConversation } from '../../bot/interface/bot-context.interface';
 
 export class UpdateProductConversation extends BaseConversation {
   constructor(
@@ -247,5 +247,3 @@ export class UpdateProductConversation extends BaseConversation {
     return;
   }
 }
-
-injected(UpdateProductConversation, TOKENS.loggerService, TOKENS.productService);

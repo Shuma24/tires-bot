@@ -1,18 +1,16 @@
-import { injected } from 'brandi';
-import { ILoggerService } from '../../common/interfaces/logger.service.interface';
-import { IBotContext, IBotConversation } from '../../tg-bot/interface/bot-context.interface';
+import { IBotContext, IBotConversation } from '../../bot/interface/bot-context.interface';
 import { BaseConversation } from '../conversation';
 import { createOrderResponse, orderAlert, startOrder, userPhone } from './helpers/text-reply';
-import { TOKENS } from '../../containter/tokens';
 import { IProductService } from '../../product/interfaces/product-service.interface';
-import { IConfigService } from '../../common/interfaces/config.service.interface';
 import { cancelOrder } from './helpers/keyboard';
+import { ILoggerService } from '../../core/common/interfaces/logger.service.interface';
+import { IAdminService } from '../../admin/interfaces/admin-service.interface';
 
 export class OrderProductsConversation extends BaseConversation {
   constructor(
     private readonly _loggerService: ILoggerService,
     private readonly _productService: IProductService,
-    private readonly _configService: IConfigService,
+    private readonly _adminService: IAdminService,
   ) {
     super(_loggerService);
   }
@@ -88,14 +86,15 @@ export class OrderProductsConversation extends BaseConversation {
       },
     );
 
-    const admins = this._configService
-      .get('ADMIN_ID')
-      .split(',')
-      .map((el) => el.trim());
+    const admins = await conversation.external(() => {
+      return this._adminService.getAll();
+    });
+
+    if (!admins) return;
 
     for (let i = 0; i < admins.length; i++) {
       await ctx.api.sendMessage(
-        admins[i],
+        admins[i].TelegramID,
         orderAlert(
           name.message?.text,
           phone.message?.text,
@@ -115,10 +114,3 @@ export class OrderProductsConversation extends BaseConversation {
     return;
   }
 }
-
-injected(
-  OrderProductsConversation,
-  TOKENS.loggerService,
-  TOKENS.productService,
-  TOKENS.configService,
-);

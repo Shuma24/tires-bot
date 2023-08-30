@@ -1,11 +1,9 @@
-import { injected } from 'brandi';
-import { ILoggerService } from '../../common/interfaces/logger.service.interface';
 import { IProductService } from '../../product/interfaces/product-service.interface';
-import { IBotContext, IBotConversation } from '../../tg-bot/interface/bot-context.interface';
+import { IBotContext, IBotConversation } from '../../bot/interface/bot-context.interface';
 import { BaseConversation } from '../conversation';
-import { TOKENS } from '../../containter/tokens';
 import { putID } from '../global/text';
 import { deleted } from './helpers/text';
+import { ILoggerService } from '../../core/common/interfaces/logger.service.interface';
 
 export class DeleteProductConversation extends BaseConversation {
   constructor(
@@ -46,5 +44,3 @@ export class DeleteProductConversation extends BaseConversation {
     return;
   }
 }
-
-injected(DeleteProductConversation, TOKENS.loggerService, TOKENS.productService);

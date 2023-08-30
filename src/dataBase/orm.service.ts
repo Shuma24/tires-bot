@@ -1,8 +1,7 @@
 import { PrismaClient } from '@prisma/client';
-import { ILoggerService } from '../common/interfaces/logger.service.interface';
+
 import { IORMService } from './orm.interface';
-import { injected } from 'brandi';
-import { TOKENS } from '../containter/tokens';
+import { ILoggerService } from '../core/common/interfaces/logger.service.interface';
 
 export class ORMService implements IORMService {
   public client: PrismaClient;
@@ -33,5 +32,3 @@ export class ORMService implements IORMService {
     }
   }
 }
-
-injected(ORMService, TOKENS.loggerService);

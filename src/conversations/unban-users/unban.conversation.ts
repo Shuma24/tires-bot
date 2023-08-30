@@ -1,13 +1,15 @@
-import { injected } from 'brandi';
-import { ILoggerService } from '../../common/interfaces/logger.service.interface';
-import { IBotContext, IBotConversation } from '../../tg-bot/interface/bot-context.interface';
 import { BaseConversation } from '../conversation';
 
-import { TOKENS } from '../../containter/tokens';
 import { unbanID } from './helpers/text';
+import { ILoggerService } from '../../core/common/interfaces/logger.service.interface';
+import { IBotContext, IBotConversation } from '../../bot/interface/bot-context.interface';
+import { IBlackListService } from '../../black-list/interfaces/black-list.service.interface';
 
 export class UnBanConversation extends BaseConversation {
-  constructor(private readonly _loggerService: ILoggerService) {
+  constructor(
+    private readonly _loggerService: ILoggerService,
+    private readonly _blackListService: IBlackListService,
+  ) {
     super(_loggerService);
   }
 
@@ -18,19 +20,17 @@ export class UnBanConversation extends BaseConversation {
   async handle(conversation: IBotConversation, ctx: IBotContext): Promise<void> {
     await ctx.reply(unbanID);
 
-    const userTelegramID = await conversation.waitFor(':text');
+    const id = await conversation.waitFor(':text');
 
-    if (
-      !userTelegramID.message?.text ||
-      isNaN(Number(userTelegramID.message.text)) ||
-      userTelegramID.message?.text === 'exit'
-    ) {
+    if (!id.message?.text || isNaN(Number(id.message.text)) || id.message?.text === 'exit') {
       await ctx.reply('Введено не число або exit');
 
       return;
     }
 
-    const isUnban = await ctx.unbanChatSenderChat(Number(userTelegramID.message.text));
+    const isUnban = conversation.external(async () => {
+      return await this._blackListService.removeFromBlackList(Number(id.message.text));
+    });
 
     if (!isUnban) return;
 
@@ -39,5 +39,3 @@ export class UnBanConversation extends BaseConversation {
     return;
   }
 }
-
-injected(UnBanConversation, TOKENS.loggerService);

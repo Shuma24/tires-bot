@@ -1,1 +1,1 @@
-export const unbanID = 'Введи ID для розбану';
+export const unbanID = 'Введи ID(Номер в ДБ) для розбану';

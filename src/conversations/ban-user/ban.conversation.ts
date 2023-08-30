@@ -1,12 +1,14 @@
-import { injected } from 'brandi';
-import { ILoggerService } from '../../common/interfaces/logger.service.interface';
-import { IBotContext, IBotConversation } from '../../tg-bot/interface/bot-context.interface';
+import { IBotContext, IBotConversation } from '../../bot/interface/bot-context.interface';
 import { BaseConversation } from '../conversation';
 import { userID } from './helpers/text';
-import { TOKENS } from '../../containter/tokens';
+import { ILoggerService } from '../../core/common/interfaces/logger.service.interface';
+import { IBlackListService } from '../../black-list/interfaces/black-list.service.interface';
 
 export class BanConversation extends BaseConversation {
-  constructor(private readonly _loggerService: ILoggerService) {
+  constructor(
+    private readonly _loggerService: ILoggerService,
+    private readonly _blackListService: IBlackListService,
+  ) {
     super(_loggerService);
   }
 
@@ -29,7 +31,9 @@ export class BanConversation extends BaseConversation {
       return;
     }
 
-    const isBan = await ctx.banChatSenderChat(Number(userTelegramID.message.text));
+    const isBan = conversation.external(async () => {
+      return await this._blackListService.addToBlackList(Number(userTelegramID.message.text));
+    });
 
     if (!isBan) return;
 
@@ -38,5 +42,3 @@ export class BanConversation extends BaseConversation {
     return;
   }
 }
-
-injected(BanConversation, TOKENS.loggerService);

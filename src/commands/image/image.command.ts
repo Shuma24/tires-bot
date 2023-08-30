@@ -1,16 +1,12 @@
-import { injected } from 'brandi';
-import { IConfigService } from '../../common/interfaces/config.service.interface';
-import { ILoggerService } from '../../common/interfaces/logger.service.interface';
-import { TOKENS } from '../../containter/tokens';
-import { IBot } from '../../tg-bot/interface/bot.interface';
+import { IAdminService } from '../../admin/interfaces/admin-service.interface';
+import { IBot } from '../../bot/interface/bot.interface';
+import { ILoggerService } from '../../core/common/interfaces/logger.service.interface';
 import { Command } from '../command';
-import { IProductService } from '../../product/interfaces/product-service.interface';
-import { adminCheck } from '../helpers/admin-check';
 
 export class ImageCommand extends Command {
   constructor(
     protected readonly _bot: IBot,
-    private readonly _configService: IConfigService,
+    private readonly _adminService: IAdminService,
     private readonly _loggerService: ILoggerService,
   ) {
     super(_bot.instance, _loggerService);
@@ -18,13 +14,19 @@ export class ImageCommand extends Command {
 
   handle(): void {
     this.bot.command('image', async (ctx) => {
-      const adminsID = this._configService.get('ADMIN_ID');
+      const listOfAdmins = await this._adminService.getAll();
 
-      if (!ctx.msg.from) {
+      if (!ctx.message?.from) {
         return await ctx.reply('Вийшла помилка спробуйте ще раз');
       }
 
-      const isAdmin = adminCheck(adminsID, ctx.msg.from.id.toString());
+      if (!listOfAdmins) {
+        return await ctx.reply('Не встановлено адмінів або проблема з ДБ');
+      }
+
+      const isAdmin = listOfAdmins.find(
+        (el) => el.TelegramID === Number(ctx.message.from.id.toString()),
+      );
 
       if (!isAdmin) return await ctx.reply('No access');
 
@@ -34,5 +36,3 @@ export class ImageCommand extends Command {
     });
   }
 }
-
-injected(ImageCommand, TOKENS.bot, TOKENS.configService, TOKENS.loggerService);

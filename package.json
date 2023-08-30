@@ -5,8 +5,8 @@
   "main": "main.js",
   "scripts": {
     "build": "tsc",
-    "start": "node ./dist/main.js",
-    "dev": "npx prisma generate && nodemon --legacy-watch --exitcrash  ./src/main.ts",
+    "start": "cross-env NODE_ENV=production && ./node_modules/.bin/pm2 start ./dist/main.js",
+    "dev": "cross-env NODE_ENV=development && npx prisma generate && nodemon --legacy-watch --exitcrash  ./src/main.ts",
     "generate": "npx prisma generate",
     "dev:migrate": "npx prisma migrate dev",
     "reset:migrate": "npx prisma migrate reset"
@@ -23,8 +23,10 @@
     "@types/node": "^20.5.0",
     "@typescript-eslint/eslint-plugin": "^6.4.0",
     "@typescript-eslint/parser": "^6.4.0",
+    "cross-env": "^7.0.3",
     "eslint": "^8.47.0",
     "nodemon": "^3.0.1",
+    "pm2": "^5.3.0",
     "ts-node": "^10.9.1",
     "typescript": "^5.1.6"
   },

@@ -1,9 +1,5 @@
 import { Command } from '../command';
-import { injected } from 'brandi';
-import { TOKENS } from '../../containter/tokens';
-import { IBot } from '../../tg-bot/interface/bot.interface';
 
-import { ILoggerService } from '../../common/interfaces/logger.service.interface';
 import { heightButtons, radiusButtons, seasonButtons, startButtons } from '../../helpers/buttons';
 import { generateWidthTires } from '../../helpers/width-button.generator';
 import { heightRegex, radiusRegex, typesRegex, widthRegex } from '../helpers/regexs';
@@ -11,9 +7,9 @@ import { checkType } from '../helpers/type-selector';
 import { handleBackHomeButtons } from '../helpers/back-home.handle';
 
 import { IProductService } from '../../product/interfaces/product-service.interface';
-import { CallbackQueryContext, CommandContext, HearsContext, InlineKeyboard } from 'grammy';
+import { CallbackQueryContext, HearsContext } from 'grammy';
 import { InlineKeyboardButton } from 'grammy/types';
-import { IBotContext } from '../../tg-bot/interface/bot-context.interface';
+
 import {
   askAboutHeight,
   askAboutRadius,
@@ -26,12 +22,17 @@ import {
   productDescriptionGenerate,
   workOnYouReq,
 } from '../helpers/start-command-text';
+import { IBot } from '../../bot/interface/bot.interface';
+import { ILoggerService } from '../../core/common/interfaces/logger.service.interface';
+import { IBotContext } from '../../bot/interface/bot-context.interface';
+import { IBlackListService } from '../../black-list/interfaces/black-list.service.interface';
 
 export class StartCommand extends Command {
   constructor(
     protected readonly _bot: IBot,
     private readonly _loggerService: ILoggerService,
     private readonly _productService: IProductService,
+    private readonly _blackListService: IBlackListService,
   ) {
     super(_bot.instance, _loggerService);
   }
@@ -53,6 +54,22 @@ export class StartCommand extends Command {
 
   private startCommand() {
     this.bot.command('start', async (ctx) => {
+      const listOfBannedUsers = await this._blackListService.getAll();
+
+      if (!ctx.message?.from) {
+        return await ctx.reply('Вийшла помилка спробуйте ще раз');
+      }
+
+      if (!listOfBannedUsers) {
+        return await ctx.reply('Problem for load black list');
+      }
+
+      const isBanned = listOfBannedUsers.find(
+        (el) => el.TelegramID === Number(ctx.message.from.id.toString()),
+      );
+
+      if (isBanned) return await ctx.reply('You banned');
+
       //start generate
       await ctx.reply('Привіт ✌🏻');
       await ctx.reply('Я допоможу тобі із підбором шин до твого 🚗');
@@ -372,5 +389,3 @@ export class StartCommand extends Command {
     });
   }
 }
-
-injected(StartCommand, TOKENS.bot, TOKENS.loggerService, TOKENS.productService);

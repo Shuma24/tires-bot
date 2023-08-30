@@ -1,21 +1,19 @@
-import { injected } from 'brandi';
 import { IProductService } from './interfaces/product-service.interface';
 import {
   IGetProductsBySize,
-  IPhotosIDTelegram,
   ITires,
   ITiresImages,
   ITiresToCreate,
 } from './interfaces/product.interface';
-import { TOKENS } from '../containter/tokens';
+
 import { ProductEntity } from './entity/product.entity';
 import { IProductRepository } from './interfaces/product-repository.interface';
-import { IConfigService } from '../common/interfaces/config.service.interface';
 
 import { IResTGPath } from './interfaces/response.interface';
 import { IStorage } from '../storage/interfaces/storage.interfaces';
-import { ILoggerService } from '../common/interfaces/logger.service.interface';
-import { IFetchService } from '../common/fetch/interfaces/fetch.interface';
+import { IConfigService } from '../core/common/interfaces/config.service.interface';
+import { IFetchService } from '../core/common/fetch/interfaces/fetch.interface';
+import { ILoggerService } from '../core/common/interfaces/logger.service.interface';
 
 export class ProductService implements IProductService {
   constructor(
@@ -257,12 +255,3 @@ export class ProductService implements IProductService {
     }
   }
 }
-
-injected(
-  ProductService,
-  TOKENS.productRepository,
-  TOKENS.configService,
-  TOKENS.fetchService,
-  TOKENS.storage,
-  TOKENS.loggerService,
-);

@@ -1,29 +1,32 @@
-import { injected } from 'brandi';
-import { IConfigService } from '../../common/interfaces/config.service.interface';
-import { ILoggerService } from '../../common/interfaces/logger.service.interface';
-import { IBot } from '../../tg-bot/interface/bot.interface';
+import { IAdminService } from '../../admin/interfaces/admin-service.interface';
+import { IBot } from '../../bot/interface/bot.interface';
+import { ILoggerService } from '../../core/common/interfaces/logger.service.interface';
 import { Command } from '../command';
-import { adminCheck } from '../helpers/admin-check';
-import { TOKENS } from '../../containter/tokens';
 
 export class UnbanUsers extends Command {
   constructor(
     protected readonly _bot: IBot,
     private readonly _loggerService: ILoggerService,
-    private readonly _configService: IConfigService,
+    private readonly _adminService: IAdminService,
   ) {
     super(_bot.instance, _loggerService);
   }
 
   handle(): void {
     this.bot.command('unban', async (ctx) => {
-      const adminsID = this._configService.get('ADMIN_ID');
+      const listOfAdmins = await this._adminService.getAll();
 
-      if (!ctx.msg.from) {
+      if (!ctx.message?.from) {
         return await ctx.reply('Вийшла помилка спробуйте ще раз');
       }
 
-      const isAdmin = adminCheck(adminsID, ctx.msg.from.id.toString());
+      if (!listOfAdmins) {
+        return await ctx.reply('Не встановлено адмінів або проблема з ДБ');
+      }
+
+      const isAdmin = listOfAdmins.find(
+        (el) => el.TelegramID === Number(ctx.message.from.id.toString()),
+      );
 
       if (!isAdmin) return await ctx.reply('No access');
 
@@ -33,5 +36,3 @@ export class UnbanUsers extends Command {
     });
   }
 }
-
-injected(UnbanUsers, TOKENS.bot, TOKENS.loggerService, TOKENS.configService);

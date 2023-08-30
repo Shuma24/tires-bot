@@ -1,12 +1,10 @@
-import { injected } from 'brandi';
 import { IProductService } from '../../product/interfaces/product-service.interface';
-import { IBotContext, IBotConversation } from '../../tg-bot/interface/bot-context.interface';
+import { IBotContext, IBotConversation } from '../../bot/interface/bot-context.interface';
 import { BaseConversation } from '../conversation';
-import { TOKENS } from '../../containter/tokens';
-import { ILoggerService } from '../../common/interfaces/logger.service.interface';
 import { putID } from '../global/text';
 import { photoCountToUploadKeyboard } from '../global/keyboard';
 import { selectCountPhoto } from './helpers/text';
+import { ILoggerService } from '../../core/common/interfaces/logger.service.interface';
 
 export class SetProductsImageConversation extends BaseConversation {
   constructor(
@@ -86,5 +84,3 @@ export class SetProductsImageConversation extends BaseConversation {
     return;
   }
 }
-
-injected(SetProductsImageConversation, TOKENS.loggerService, TOKENS.productService);

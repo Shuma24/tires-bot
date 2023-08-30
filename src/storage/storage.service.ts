@@ -7,11 +7,9 @@ import {
 import { Upload } from '@aws-sdk/lib-storage';
 
 import { IStorage, IUploadResponse, inputFiles } from './interfaces/storage.interfaces';
-import { IConfigService } from '../common/interfaces/config.service.interface';
-import { ILoggerService } from '../common/interfaces/logger.service.interface';
 import { RandomNameGenerator } from './helpers/name-photo-generator';
-import { injected } from 'brandi';
-import { TOKENS } from '../containter/tokens';
+import { IConfigService } from '../core/common/interfaces/config.service.interface';
+import { ILoggerService } from '../core/common/interfaces/logger.service.interface';
 
 export class S3Storage implements IStorage {
   private readonly bucketName: string;
@@ -98,5 +96,3 @@ export class S3Storage implements IStorage {
     }
   }
 }
-
-injected(S3Storage, TOKENS.configService, TOKENS.loggerService);

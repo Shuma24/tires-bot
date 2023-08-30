@@ -1,5 +1,3 @@
-import { injected } from 'brandi';
-import { TOKENS } from '../containter/tokens';
 import { IORMService } from '../dataBase/orm.interface';
 import { IProductRepository } from './interfaces/product-repository.interface';
 import {
@@ -161,5 +159,3 @@ export class ProductRepository implements IProductRepository {
     };
   }
 }
-
-injected(ProductRepository, TOKENS.ormService);
