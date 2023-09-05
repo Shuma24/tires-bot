@@ -1,0 +1,14 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.imageCount = exports.isPhotoProduct = exports.waitForCreate = exports.productQuantity = exports.productHeight = exports.productWidth = exports.productRadius = exports.productType = exports.productPrice = exports.productDescription = exports.productName = void 0;
+exports.productName = 'Введи назву коліс';
+exports.productDescription = 'Тепер напиши опис до коліс';
+exports.productPrice = 'Харош, введи ціну';
+exports.productType = 'Обери будь ласка тип';
+exports.productRadius = `Тепер обери радіус`;
+exports.productWidth = 'Окей, обери ширину';
+exports.productHeight = `Введи, висоту`;
+exports.productQuantity = `Коліс в наявності?`;
+exports.waitForCreate = `<b>Так я буду створювати продукт, зачекай</b>`;
+exports.isPhotoProduct = 'Будеш добавляти фото';
+exports.imageCount = 'Вибери скільки фото будеш добавляти';

@@ -42,7 +42,7 @@ injected(
   TOKENS.addProductCommand,
   TOKENS.imageCommand,
   TOKENS.DeleteProductCommand,
-  TOKENS.unbanCommand,
+  TOKENS.UpdateProductCommand,
   TOKENS.getProductCommand,
   TOKENS.banCommand,
   TOKENS.unbanCommand,

@@ -7,9 +7,7 @@ export class ConfigService implements IConfigService {
   config: DotenvParseOutput;
 
   constructor(private readonly _loggerService: ILoggerService) {
-    const env = process.env.NODE_ENV || 'development';
-
-    const { error, parsed } = config({ path: `.env.${env}` });
+    const { error, parsed } = config({ path: `.env` });
 
     if (error) throw new Error('.env is required.');
 

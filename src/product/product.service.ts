@@ -163,7 +163,7 @@ export class ProductService implements IProductService {
 
       if (product.images) {
         for (let i = 0; i < product.images.length; i++) {
-          const baseURL = 'https://furniture-shop24.s3.eu-central-1.amazonaws.com/';
+          const baseURL = 'https://tiresbotbucket.s3.eu-central-1.amazonaws.com/';
 
           const key = decodeURIComponent(product.images[i].url.replace(baseURL, ''));
 

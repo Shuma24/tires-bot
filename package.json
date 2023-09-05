@@ -5,8 +5,8 @@
   "main": "main.js",
   "scripts": {
     "build": "tsc",
-    "start": "cross-env NODE_ENV=production && ./node_modules/.bin/pm2 start ./dist/main.js",
-    "dev": "cross-env NODE_ENV=development && npx prisma generate && nodemon --legacy-watch --exitcrash  ./src/main.ts",
+    "start": "tsc && npx prisma generate && node ./dist/main.js",
+    "dev": "npx prisma generate && nodemon --legacy-watch --exitcrash  ./src/main.ts",
     "generate": "npx prisma generate",
     "dev:migrate": "npx prisma migrate dev",
     "reset:migrate": "npx prisma migrate reset"
@@ -26,7 +26,6 @@
     "cross-env": "^7.0.3",
     "eslint": "^8.47.0",
     "nodemon": "^3.0.1",
-    "pm2": "^5.3.0",
     "ts-node": "^10.9.1",
     "typescript": "^5.1.6"
   },
@@ -39,6 +38,7 @@
     "brandi": "^5.0.0",
     "dotenv": "^16.3.1",
     "grammy": "^1.17.2",
+    "pm2": "^5.3.0",
     "prisma": "^5.1.1",
     "winston": "^3.10.0"
   }

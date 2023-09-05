@@ -1,0 +1,13 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.findByType = exports.findByQuantity = exports.findByHeight = exports.findByWidth = exports.findByRadius = exports.findByPrice = exports.findByDescription = exports.findByName = exports.findByID = exports.findBy = void 0;
+exports.findBy = 'Вибери по чому шукати';
+exports.findByID = 'Введи ID';
+exports.findByName = `Введи ім'я`;
+exports.findByDescription = 'Введи опис';
+exports.findByPrice = 'Введи ціну';
+exports.findByRadius = 'Обери радіус';
+exports.findByWidth = 'Обери ширину';
+exports.findByHeight = 'Обери висоту';
+exports.findByQuantity = 'Обери кількість';
+exports.findByType = 'Обери кільксть ';

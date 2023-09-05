@@ -1,0 +1,13 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.setNewType = exports.setNewQuantity = exports.setNewHeight = exports.setNewWidth = exports.setNewRadius = exports.setNewPrice = exports.setNewDescription = exports.setNewName = exports.fieldToUpdate = exports.awaitUserID = void 0;
+exports.awaitUserID = 'Відправ ID продукту для оновлення';
+exports.fieldToUpdate = 'Обери, що ти хочеш обновини';
+exports.setNewName = `Введи нове ім'я`;
+exports.setNewDescription = `Тепер напиши новий опис до коліс`;
+exports.setNewPrice = `Напиши нову ціну`;
+exports.setNewRadius = `Обери новий радіус`;
+exports.setNewWidth = `Обери нову ширину`;
+exports.setNewHeight = `Обери нову висоту`;
+exports.setNewQuantity = `Скільки коліс в наявності`;
+exports.setNewType = 'Обери будь ласка новий тип';

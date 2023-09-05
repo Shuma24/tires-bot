@@ -1,0 +1,12 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.blackListModule = void 0;
+const brandi_1 = require("brandi");
+const tokens_1 = require("../containter/tokens");
+const black_list_service_1 = require("./black-list.service");
+const black_list_repository_1 = require("./black-list.repository");
+exports.blackListModule = new brandi_1.DependencyModule();
+exports.blackListModule.bind(tokens_1.TOKENS.blackListService).toInstance(black_list_service_1.BlackListService).inSingletonScope();
+exports.blackListModule.bind(tokens_1.TOKENS.blackListRepository).toInstance(black_list_repository_1.BlackListRepository).inSingletonScope();
+(0, brandi_1.injected)(black_list_service_1.BlackListService, tokens_1.TOKENS.loggerService, tokens_1.TOKENS.blackListRepository);
+(0, brandi_1.injected)(black_list_repository_1.BlackListRepository, tokens_1.TOKENS.ormService);

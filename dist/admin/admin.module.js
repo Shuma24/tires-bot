@@ -1,0 +1,12 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.adminModule = void 0;
+const brandi_1 = require("brandi");
+const tokens_1 = require("../containter/tokens");
+const admin_service_1 = require("./admin.service");
+const admin_repository_1 = require("./admin.repository");
+exports.adminModule = new brandi_1.DependencyModule();
+exports.adminModule.bind(tokens_1.TOKENS.adminService).toInstance(admin_service_1.AdminService).inSingletonScope();
+exports.adminModule.bind(tokens_1.TOKENS.adminRepository).toInstance(admin_repository_1.AdminRepository).inSingletonScope();
+(0, brandi_1.injected)(admin_service_1.AdminService, tokens_1.TOKENS.loggerService, tokens_1.TOKENS.adminRepository);
+(0, brandi_1.injected)(admin_repository_1.AdminRepository, tokens_1.TOKENS.ormService);
